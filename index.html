@@ -13,27 +13,29 @@
 <body>
 		<h1 class="h_main">Sliding puzzle</h1>
 
-	<div id="puzzle" class="puzzleTable col-sm-12 col-md-8 col-lg-8" style="background-color: red;">
+	<div class="col-sm-12 col-md-8 col-lg-8">
+		<div id="puzzle" class="puzzleTable">
+		</div>
 	</div>
 
 	<div class="col-sm-12 col-md-4 col-lg-4" >
 		<div class="info choice col-sm-12">
 			<form action="#">
 				<h3 class="h_main col-sm-12">Puzzle configuration</h3>
-				<div class="col-md-12">
+				<div class="col-sm-12">
 					<label for="size" class="col-sm-5">Puzzle size:</label>
 					<select id="size" class="col-sm-7">
 						<!-- <option value="3">3</option> -->
 						<!-- <option value="4">4</option> -->
 					</select>
 				</div>
-				<div class="col-md-12">
+				<div class="col-sm-12">
 					<label for="algorithmType" class="col-sm-5">Algorithm type:</label>
 					<select id="algorithmType" class="col-sm-7">
 						<option value="aStar">A*</option>
 					</select>
 				</div>
-				<div class="col-md-12">
+				<div class="col-sm-12">
 					<label for="heuristicType" class="col-sm-5">Heuristic type:</label>
 					<select id="heuristicType" class="col-sm-7">
 						<option value="manhattan">Manhattan</option>
