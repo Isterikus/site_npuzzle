@@ -16,48 +16,45 @@
 	<div id="puzzle" class="puzzleTable col-sm-12 col-md-8 col-lg-8" style="background-color: red;">
 	</div>
 
-	<div class="info col-sm-12 col-md-4 col-lg-4" style="background-color: black;">
-		<div class="choice">
+	<div class="col-sm-12 col-md-4 col-lg-4" >
+		<div class="info choice col-sm-12">
 			<form action="#">
-				<h3 class="h_main ">Puzzle configuration</h3>
-				<table>
-					<tr>
-						<td colspan='2' class='header'>Puzzle
-							configuration</td>
-					</tr>
-					<tr>
-						<td class='label'>Puzzle type:</td>
-						<td><select id="size"></select></td>
-					</tr>
-					<tr>
-						<td class='label'>Algorithm type:</td>
-						<td><select id="algorithmType"></select><span></span></td>
-					</tr>
-					<tr>
-						<td class='label'>Heuristic type:</td>
-						<td><select id="heuristicType"></select></td>
-					</tr>
-				</table>
+				<h3 class="h_main col-sm-12">Puzzle configuration</h3>
+				<div class="col-md-12">
+					<label for="size" class="col-sm-5">Puzzle size:</label>
+					<select id="size" class="col-sm-7">
+						<!-- <option value="3">3</option> -->
+						<!-- <option value="4">4</option> -->
+					</select>
+				</div>
+				<div class="col-md-12">
+					<label for="algorithmType" class="col-sm-5">Algorithm type:</label>
+					<select id="algorithmType" class="col-sm-7">
+						<option value="aStar">A*</option>
+					</select>
+				</div>
+				<div class="col-md-12">
+					<label for="heuristicType" class="col-sm-5">Heuristic type:</label>
+					<select id="heuristicType" class="col-sm-7">
+						<option value="manhattan">Manhattan</option>
+					</select>
+				</div>
 			</form>
 		</div>
-		<div>
-			<table cellpadding="5">
-				<tr>
-					<td colspan='2' class='header'>Results</td>
-				</tr>
-				<tr>
-					<td class='label'># of moves:</td>
-					<td><span id='numberOfMoves'></span></td>
-				</tr>
-				<tr>
-					<td class='label'>Elapsed time:</td>
-					<td><span id='elapsedTime'></span>ms</td>
-				</tr>
-				<tr>
-					<td class='label'>Path:</td>
-					<td><span id='path'></span></td>
-				</tr>
-			</table>
+		<div class="info rezult col-sm-12">
+			<h3 class="h_main col-sm-12">Results</h3>
+			<div class="col-md-12">
+				<label for="moves" class="col-sm-5">Number of moves:</label>
+				<span id="moves" class="col-sm-7">1</span>
+			</div>
+			<div class="col-md-12">
+				<label for="timePython" class="col-sm-5">Time Python:</label>
+				<span id="timePython" class="col-sm-7">1</span>
+			</div>
+			<div class="col-md-12">
+				<label for="timeC" class="col-sm-5">Time C:</label>
+				<span id="timeC" class="col-sm-7">1</span>
+			</div>
 		</div>
 	</div>
 
