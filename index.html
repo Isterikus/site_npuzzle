@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<title>N puzzle</title>
+
+</head>
+
+<body>
+		<h1 class="h_main">Sliding puzzle</h1>
+
+	<div id="puzzle" class="puzzleTable col-sm-12 col-md-8 col-lg-8" style="background-color: red;">
+	</div>
+
+	<div class="info col-sm-12 col-md-4 col-lg-4" style="background-color: black;">
+		<div class="choice">
+			<form action="#">
+				<h3 class="h_main ">Puzzle configuration</h3>
+				<table>
+					<tr>
+						<td colspan='2' class='header'>Puzzle
+							configuration</td>
+					</tr>
+					<tr>
+						<td class='label'>Puzzle type:</td>
+						<td><select id="size"></select></td>
+					</tr>
+					<tr>
+						<td class='label'>Algorithm type:</td>
+						<td><select id="algorithmType"></select><span></span></td>
+					</tr>
+					<tr>
+						<td class='label'>Heuristic type:</td>
+						<td><select id="heuristicType"></select></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div>
+			<table cellpadding="5">
+				<tr>
+					<td colspan='2' class='header'>Results</td>
+				</tr>
+				<tr>
+					<td class='label'># of moves:</td>
+					<td><span id='numberOfMoves'></span></td>
+				</tr>
+				<tr>
+					<td class='label'>Elapsed time:</td>
+					<td><span id='elapsedTime'></span>ms</td>
+				</tr>
+				<tr>
+					<td class='label'>Path:</td>
+					<td><span id='path'></span></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="actionsBar">
+		<button id="random">Make it random!</button>
+		<button id="solve">Solve!</button>
+		<button id="play">Play the result!</button>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+
+</body>
+</html>
