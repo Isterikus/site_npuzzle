@@ -1,26 +1,24 @@
 import os
-
-# if __name__ == "__main__":
-# 	return sys;
-
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, url_for, render_template
 from flask_cors import CORS
 import json
+
+from python.generator import *
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
+@app.route('/index.html')
 def main():
-	url_for('web', filename='style.css')
-	url_for('web/js', filename='style.css')
-	return jsonify(data)
+	return render_template('index.html')
 
-@app.route('/tst', methods=['POST'])
-def goodbye_world():
-	print(request.json)
-	data = {'data': os.getcwd()}
-	return jsonify(data)
+@app.route('/rand', methods=['POST'])
+def rand():
+	path2 = make_puzzle(int(request.json['size']), True, 10000)
+	print(path2)
+	ret = [str(i)+"," for i in path2]
+	return json.dumps(ret)
 
 
 if __name__ == '__main__':

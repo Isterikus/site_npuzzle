@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<title>N puzzle</title>
+
+</head>
+
+<body>
+		<h1 class="h_main">Sliding puzzle</h1>
+
+	<div class="col-sm-12 col-md-8">
+		<div id="puzzle" class="puzzleTable">
+		</div>
+		<div id="actionsBar">
+			<button class="btn btn-primary actionButtons" id="random">Make it random!</button>
+			<button class="btn btn-success actionButtons" id="solve">Solve!</button>
+			<button class="btn btn-primary actionButtons" id="play">Play the result!</button>
+		</div>
+	</div>
+
+	<div class="col-sm-12 col-md-4">
+		<div class="info choice col-sm-12">
+			<form action="#">
+				<h3 class="h_main col-sm-12">Puzzle configuration</h3>
+				<div class="col-sm-12">
+					<label for="size" class="col-sm-5">Puzzle size:</label>
+					<select id="size" class="col-sm-7">
+						<!-- <option value="3">3</option> -->
+						<!-- <option value="4">4</option> -->
+					</select>
+				</div>
+				<div class="col-sm-12">
+					<label for="algorithmType" class="col-sm-5">Algorithm type:</label>
+					<select id="algorithmType" class="col-sm-7">
+						<!-- <option value="aStar">A*</option> -->
+					</select>
+				</div>
+				<div class="col-sm-12" id="heuristicTypes">
+					<label class="col-sm-12">Heuristic types:</label>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="manhattan" value="manhattan"> Manhattan distance
+						</label>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="linear" value="linear"> Linear conflict
+						</label>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="patternDatabase" value="patternDatabase"> Pattern database
+						</label>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="info rezult col-sm-12">
+			<h3 class="h_main col-sm-12">Results</h3>
+			<div class="col-sm-12">
+				<label for="moves" class="col-sm-5">Number of moves:</label>
+				<span id="moves" class="col-sm-7">1</span>
+			</div>
+			<div class="col-sm-12">
+				<label for="timePython" class="col-sm-5">Time Python:</label>
+				<span id="timePython" class="col-sm-7">1</span>
+			</div>
+			<div class="col-sm-12">
+				<label for="timeC" class="col-sm-5">Time C:</label>
+				<span id="timeC" class="col-sm-7">1</span>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+var minSize = 3;
+var maxSize = 6;
+var algoTypes = [{'val': 'adaStar', 'text': 'ADA*'}, {'val': 'ada', 'text': 'A*'}];
+var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
+
+function setPuzzle() {
+	var size = Number($('#size').val());
+	var field = $('#puzzle');
+
+	field.html('');
+	// field.css('height', 195);
+	field.css('width', size * 61 + 18);
+	for (var i = 1; i < Math.pow(size, 2); i++) {
+		$('#puzzle').append("<div class='tile' id='tile- " + i + "'>" + i + "</div>");
+	}
+	$('#puzzle').append("<div class='empty' id='tile-0'></div>");
+	$('#puzzle').css('height', $('#puzzle').css('width'));
+}
+
+function setSize() {
+	for (var i = minSize; i <= maxSize; i++) {
+		$('#size').append("<option value='" + i + "'>" + i + "</option>");
+	}
+}
+
+function setAlgoTypes() {
+	for (var i = 0; i < algoTypes.length; i++) {
+		$('#algorithmType').append("<option value='" + algoTypes[i].val + "'>" + algoTypes[i].text + "</option>");
+	}
+}
+
+function setHeuristicTypes() {
+	var obj = $('#heuristicTypes');
+}
+
+function request(page, data) {
+	xhr = new XMLHttpRequest();
+
+	xhr.open('POST', 'http://127.0.0.1:5000/' + page);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.onload = function() {
+		console.log('XHR = ', xhr);
+		return xhr.responseText;
+		if (xhr.status == 200) {
+			console.log('ZAEBIS');
+			return xhr.responseText;
+			// alert('Cool = ' + xhr.responseText);
+		} else if (xhr.status != 200) {
+			alert('Request failed.  Returned status of ' + xhr.status);
+		}
+	};
+	xhr.send(JSON.stringify(data));
+}
+
+function getRandPath() {
+	return request('rand', {size: $('#size').val()});
+}
+
+$('#size').change(function () {
+	setPuzzle();
+});
+
+$('#random').click(function () {
+	var size = Number($('#size').val());
+	var field = $('#puzzle');
+
+	var path = getRandPath(size);
+	console.log('PATH = ', path);
+	return;
+	field.html('');
+	field.css('width', size * 61 + 18);
+	for (var i = 1; i < Math.pow(size, 2); i++) {
+		$('#puzzle').append("<div class='tile' id='tile- " + i + "'>" + i + "</div>");
+	}
+	$('#puzzle').append("<div class='empty' id='tile-0'></div>");
+	$('#puzzle').css('height', $('#puzzle').css('width'));
+});
+
+$(document).ready(function () {
+	setSize();
+	setPuzzle();
+	setAlgoTypes();
+	// setHeuristicTypes();
+});
+	</script>
+
+	<!-- <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script> -->
+
+</body>
+</html>
