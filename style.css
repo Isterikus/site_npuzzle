@@ -1,3 +1,8 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+
 .h_main {
 	width: 100%;
 	text-align: center;
@@ -20,18 +25,32 @@
 	margin-bottom: 30px;
 }
 
+#actionsBar {
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+}
+
+.actionButtons {
+	margin-right: 5px;
+	margin-bottom: 10px;
+}
+
 #puzzle {
 	overflow: hidden;
+	padding: 5px;
+	padding-bottom: 0px;
+	margin: auto;
 	border: solid 4px rgb(222, 162, 84);
-	border-radius: 25px;
+	border-radius: 17px;
 	padding: auto;
 	position: relative;
 	background-color: gray;
 }
 
 .tile,.empty {
-	width: 65px;
-	height: 65px;
+	width: 60px;
+	height: 60px;
 	float: left;
 	text-align: center;
 	line-height: 65px;
@@ -45,4 +64,13 @@
 	background-color: white;
 	border: solid 1px black;
 	border-radius: 5px;
+}
+
+#heuristicTypes {
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.heuristic {
+	color: rgb(80, 80, 80);
 }
