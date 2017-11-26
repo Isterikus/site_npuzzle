@@ -15,11 +15,11 @@ def main():
 
 @app.route('/rand', methods=['POST'])
 def rand():
+	print(request.form)
 	path2 = make_puzzle(int(request.json['size']), True, 10000)
 	print(path2)
-	ret = [str(i)+"," for i in path2]
-	return json.dumps(ret)
-
+	# ret = [str(i)+"," for i in path2]
+	return json.dumps(path2)
 
 if __name__ == '__main__':
 	app.run(debug=True)

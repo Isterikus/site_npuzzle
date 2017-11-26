@@ -50,7 +50,7 @@ function request(page, data) {
 			alert('Request failed.  Returned status of ' + xhr.status);
 		}
 	};
-	setTimeout(function(){xhr.send(JSON.stringify(data));}, 400);
+	xhr.send(JSON.stringify(data));
 	return ret;
 }
 
@@ -66,16 +66,18 @@ $('#random').click(function () {
 	var size = Number($('#size').val());
 	var field = $('#puzzle');
 
-	var path = getRandPath(size);
-	console.log('PATH = ', path);
-	return;
-	field.html('');
-	field.css('width', size * 61 + 18);
-	for (var i = 1; i < Math.pow(size, 2); i++) {
-		$('#puzzle').append("<div class='tile' id='tile- " + i + "'>" + i + "</div>");
-	}
-	$('#puzzle').append("<div class='empty' id='tile-0'></div>");
-	$('#puzzle').css('height', $('#puzzle').css('width'));
+	console.log('new');
+	$.when( var path = getRandPath(size) ).done(function () {
+		console.log('PATH = ', path);
+		return;
+		field.html('');
+		field.css('width', size * 61 + 18);
+		for (var i = 1; i < Math.pow(size, 2); i++) {
+			$('#puzzle').append("<div class='tile' id='tile- " + i + "'>" + i + "</div>");
+		}
+		$('#puzzle').append("<div class='empty' id='tile-0'></div>");
+		$('#puzzle').css('height', $('#puzzle').css('width'));
+	});
 });
 
 $(document).ready(function () {
