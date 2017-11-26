@@ -93,10 +93,17 @@ function setPuzzle() {
 	field.html('');
 	// field.css('height', 195);
 	field.css('width', size * 61 + 18);
-	for (var i = 1; i < Math.pow(size, 2); i++) {
-		$('#puzzle').append("<div class='tile' id='tile- " + i + "'>" + i + "</div>");
+	var c = 1;
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			if (i == size - 1 && j == size - 1) {
+				break;
+			}
+			$('#puzzle').append("<div class='tile' id='tile-" + i + "-" + j + "'>" + c + "</div>");
+			c++;
+		}
 	}
-	$('#puzzle').append("<div class='empty' id='tile-0'></div>");
+	$('#puzzle').append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
 	$('#puzzle').css('height', $('#puzzle').css('width'));
 }
 
@@ -117,32 +124,17 @@ function setHeuristicTypes() {
 }
 
 function request(page, dataSend) {
-	// xhr = new XMLHttpRequest();
-
-	// xhr.open('POST', 'http://127.0.0.1:5000/' + page);
-	// xhr.setRequestHeader('Content-Type', 'application/json');
-	// xhr.onload = function() {
-	// 	console.log('XHR = ', xhr);
-	// 	return xhr.responseText;
-	// 	if (xhr.status == 200) {
-	// 		console.log('ZAEBIS');
-	// 		return xhr.responseText;
-	// 		// alert('Cool = ' + xhr.responseText);
-	// 	} else if (xhr.status != 200) {
-	// 		alert('Request failed.  Returned status of ' + xhr.status);
-	// 	}
-	// };
-	// xhr.send(JSON.stringify(data));
-	$.post(page, dataSend).done(function(translated) {
-		console.log('TR = ', translated);
-		return translated;
-	}).fail(function() {
-		console.log("Error: Could not contact server.");
+	$.ajax({
+		type: 'POST',
+		url: page,
+		data: dataSend,
+		success: function (translated) {
+			console.log('TR = ', translated);
+			ret = translated;
+		},
+		async:false
 	});
-}
-
-function getRandPath() {
-	return request('rand', {size: $('#size').val()});
+	return ret;
 }
 
 $('#size').change(function () {
@@ -154,17 +146,59 @@ $('#random').click(function () {
 	var field = $('#puzzle');
 
 	console.log('new');
-	$.when( path = getRandPath(size) ).done(function () {
-		console.log('PATH = ', path);
-		return;
-		field.html('');
-		field.css('width', size * 61 + 18);
-		for (var i = 1; i < Math.pow(size, 2); i++) {
-			$('#puzzle').append("<div class='tile' id='tile- " + i + "'>" + i + "</div>");
+	path = eval(request('rand', {size: $('#size').val()}));
+	console.log('PATH = ', path);
+	field.html('');
+	field.css('width', size * 61 + 18);
+	var c = 0;
+	console.log("PATH = ", path);
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			if (i == size - 1 && j == size - 1) {
+				break;
+			}
+			if (path[c] == 0) {
+				field.append("<div class='empty' id='tile-" + i + "-" + j + "'></div>");
+			} else {
+				field.append("<div class='tile' id='tile-" + i + "-" + j + "'>" + path[c] + "</div>");
+			}
+			c++;
 		}
-		$('#puzzle').append("<div class='empty' id='tile-0'></div>");
-		$('#puzzle').css('height', $('#puzzle').css('width'));
-	});
+	}
+	if (path[c] == 0) {
+		field.append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
+	} else {
+		field.append("<div class='tile' id='tile-" + (size - 1) + "-" + (size - 1) + "'>" + path[c] + "</div>");
+	}
+	// $('#puzzle').css('height', $('#puzzle').css('width'));
+});
+
+$('#solve').click(function () {
+	var size = Number($('#size').val());
+	var algorithmType = $('#algorithmType');
+	var manhattan = ($('#manhattan').prop('checked')) ? 1 : 0;
+	var linear = ($('#linear').prop('checked')) ? 1 : 0;
+	var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
+
+	var field = "";
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			val = $('#tile-' + i + '-' + j).html();
+			if (!val) {
+				field += '0';
+			} else {
+				field += val;
+			}
+			if (!(i == size - 1 && j == size - 1)) {
+				field += ',';
+			}
+		}
+	}
+	console.log(field);
+	data = {size: size, field: field, manhattan: manhattan, linear: linear, patternDatabase: patternDatabase};
+	ret = eval(request('solve', data));
+	console.log(ret['time']);
+	$("#timePython").html(ret['time']);
 });
 
 $(document).ready(function () {
