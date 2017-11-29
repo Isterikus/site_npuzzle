@@ -47,3 +47,4 @@ class Node():
 			tmp_field[i][j],tmp_field[i][j+1] = tmp_field[i][j+1],tmp_field[i][j]
 			childrens.append(Node(tmp_field, size))
 		return childrens
+
