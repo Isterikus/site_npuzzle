@@ -20,31 +20,38 @@ class Node():
 		self.parent = parent
 		self.g = parent.getG() + 1
 
+	def getParent(self):
+		return self.parent
+
 	def setG(self, g):
 		self.g = g
 
 	def getG(self):
 		return self.g
 
+	def copyField(self):
+		field = []
+		for i in range(self.size):
+			field.append(copy.copy(self.field[i]))
+		return field
+
 	def getChildrens(self):
 		i,j = self.getZero()
 		childrens = []
-
 		if i > 0:
-			tmp_field = copy.copy(self.field)
+			tmp_field = self.copyField()
 			tmp_field[i][j],tmp_field[i-1][j] = tmp_field[i-1][j],tmp_field[i][j]
-			childrens.append(Node(tmp_field, size))
+			childrens.append(Node(tmp_field, self.size))
 		if i < self.size - 1:
-			tmp_field = copy.copy(self.field)
+			tmp_field = self.copyField()
 			tmp_field[i][j],tmp_field[i+1][j] = tmp_field[i+1][j],tmp_field[i][j]
-			childrens.append(Node(tmp_field, size))
+			childrens.append(Node(tmp_field, self.size))
 		if j > 0:
-			tmp_field = copy.copy(self.field)
+			tmp_field = self.copyField()
 			tmp_field[i][j],tmp_field[i][j-1] = tmp_field[i][j-1],tmp_field[i][j]
-			childrens.append(Node(tmp_field, size))
+			childrens.append(Node(tmp_field, self.size))
 		if j < self.size - 1:
-			tmp_field = copy.copy(self.field)
+			tmp_field = self.copyField()
 			tmp_field[i][j],tmp_field[i][j+1] = tmp_field[i][j+1],tmp_field[i][j]
-			childrens.append(Node(tmp_field, size))
+			childrens.append(Node(tmp_field, self.size))
 		return childrens
-
