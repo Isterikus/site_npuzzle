@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	# path = [6, 5, 1, 7, 0, 3, 4, 2, 8]
 	print(path)
 	# final
-	f = Algorithms("idaStar", size, "patternDatabase")
+	f = Algorithms("idaStar", size, "patternDatabase2")
 	rez = f.solve(Node(path, size))
 	print("TIME FINAL = ", rez['time'])
 	# first
