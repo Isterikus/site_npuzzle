@@ -54,4 +54,9 @@ class Node():
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos+1] = tmp_field[pos+1],0
 			childrens.append(Node(tmp_field, self.size))
+		i = 0
+		while i < len(childrens):
+			if self.getParent() != None and self.getParent().field == childrens[i].field:
+				del childrens[i]
+			i += 1
 		return childrens

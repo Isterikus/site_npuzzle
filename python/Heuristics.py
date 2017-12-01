@@ -100,10 +100,10 @@ class Heuristics():
 				h += self.patternDatabase2(field)
 		return h
 
-field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
-# field = [3,7,2,0,1,5,6,4,8]
-# field = [7,6,2,5,0,1,4,8,3]
-# field = [4,2,5,1,0,6,3,8,7]
-heu = Heuristics("patternDatabase2", 4)
-h = heu.getH(field)
-print(h)
+# field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
+# # field = [3,7,2,0,1,5,6,4,8]
+# # field = [7,6,2,5,0,1,4,8,3]
+# # field = [4,2,5,1,0,6,3,8,7]
+# heu = Heuristics("patternDatabase2", 4)
+# h = heu.getH(field)
+# print(h)
