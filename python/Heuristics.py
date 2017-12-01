@@ -52,6 +52,17 @@ class Heuristics():
 						h += 2
 		return h
 
+	def patternDatabase(self, field):
+		base = [[2,3,4],[1,5,6,9,10,13],[7,8,11,12,14,15]]
+		h = [0,0,0]
+		for pos in range(self.all_cells):
+			if field[pos] != 0:
+				for i in range(3):
+					if field[pos] in base[i]:
+						h[i] += (abs(pos // self.size - self.real_positions[field[pos]]['i'])
+							+ abs(pos % self.size - self.real_positions[field[pos]]['j']))
+		return max(h)
+
 	def getH(self, field):
 		h = 0
 		for heuristic in self.heuristics.split('+'):
@@ -61,11 +72,14 @@ class Heuristics():
 				h += self.linear(field)
 			elif heuristic == "linear2":
 				h += self.linear2(field)
+			elif heuristic == "patternDatabase":
+				h += self.patternDatabase(field)
 		return h
 
+# field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
 # field = [3,7,2,0,1,5,6,4,8]
 # field = [7,6,2,5,0,1,4,8,3]
 # field = [4,2,5,1,0,6,3,8,7]
-# heu = Heuristics("linear", 3)
+# heu = Heuristics("patternDatabase", 4)
 # h = heu.getH(field)
 # print(h)

@@ -42,12 +42,12 @@ class Algorithms():
 		if self.algorithm == "idaStar":
 			return self.idaStar(startNode)
 
-test = Algorithms("idaStar", 3, "manhattan+linear2")
+# test = Algorithms("idaStar", 3, "manhattan+linear2")
 
 # 3
 # 2 7 6
 # 3 5 4
 # 0 1 8
 
-test.solve(Node([2,7,6,3,5,4,0,1,8], 3))
+# test.solve(Node([2,7,6,3,5,4,0,1,8], 3))
 # test.solve(Node([[1,2,3],[4,5,6],[7,0,8]], 3))
