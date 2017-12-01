@@ -2,8 +2,6 @@ from time import time
 from Heuristics import *
 from Node import *
 
-import multiprocessing
-
 class Algorithms():
 	def __init__(self, algorithm, size, heuristics):
 		self.goal = [i+1 for i in range(pow(size, 2))]
@@ -11,49 +9,35 @@ class Algorithms():
 		self.algorithm = algorithm
 		self.size = size
 		self.heuristics = Heuristics(heuristics, size)
-		self.bound = 0
+		self.heu_time = 0
 	
 	# IDA* START
 
-	def depthFirstSearch(self, current):
-		threads = []
+	def depthFirstSearch(self, current, bound):
 		if current.field == self.goal:
 			return current
-		childrens = current.getChildrens()
-		i = 0
-		while i < len(childrens):
-			childrens[i].setParent(current)
-			if childrens[i].getG() + self.heuristics.getH(childrens[i].field) > self.bound:
-				del childrens[i]
-			i += 1
-		print(childrens)
-		if len(childrens) == 0:
-			return None
-		print(childrens)
-		p = multiprocessing.Pool()
-		results = p.map(self.depthFirstSearch,[child for child in childrens])
-		for rez in results:
-			if rez != None:
-				return rez
-		p.close()
-		p.join()
-		'''
-			rez = self.depthFirstSearch(children, bound)
-			if rez != None:
-				return rez
-		'''
+		for children in current.getChildrens():
+				children.setParent(current)
+				temp = time()
+				h = self.heuristics.getH(children.field)
+				self.heu_time += time() - temp
+				if children.getG() + h <= bound:
+					rez = self.depthFirstSearch(children, bound)
+					if rez != None:
+						return rez
 		return None
 
 	def idaStar(self, startNode):
-		self.bound = self.heuristics.getH(startNode.field)
+		bound = self.heuristics.getH(startNode.field)
 		solution = None
 		startTime = time()
 		while solution == None:
-			solution = self.depthFirstSearch(startNode)
-			self.bound += 2
-			print("B=  ", self.bound)
+			solution = self.depthFirstSearch(startNode, bound)
+			bound += 2
+			# print("B=  ", bound)
 		finish_time = time() - startTime
-		# print("PYTHON_IDA* TIME = ", finish_time)
+		print("PYTHON_IDA* TIME = ", finish_time)
+		print("HEU TIME = ", self.heu_time)
 		return {'time':finish_time,'solution':solution}
 
 	# IDA* END
