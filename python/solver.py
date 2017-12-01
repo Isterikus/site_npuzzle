@@ -40,8 +40,8 @@ class State(object):
 		return self.g + self.h
 
 	def setH(self):
-		self.h = self.getPatternDatabase() + self.getLinearConflictMine()
-		# self.h = self.getManhattan() + self.getLinearConflicxtMine()# + self.getOutOf()
+		# self.h = self.getPatternDatabase() + self.getLinearConflictMine()
+		self.h = self.getManhattan() + self.getLinearConflictMine()# + self.getOutOf()
 
 	def setG(self, g):
 		self.g = g
@@ -280,7 +280,7 @@ def ida_star(initialState):
 	rez_time = 0
 	# print_field(initialState.field)
 	start_time = time.time()
-	print("FIRST H = ", bound)
+	# print("FIRST H = ", bound)
 	while True:
 		# print('BOUND = ', bound)
 		t = search(initialState, 0, bound)
@@ -289,6 +289,7 @@ def ida_star(initialState):
 			rez_time = time.time() - start_time
 			break
 		bound += 2
+		# print("B = ", bound)
 	return rez_time
 
 def solver(initial_field, main):

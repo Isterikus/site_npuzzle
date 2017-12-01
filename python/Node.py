@@ -1,17 +1,17 @@
-import copy
+from copy import copy
 
 class Node():
 	def __init__(self, field, size):
 		self.field = field
 		self.size = size
+		self.all_cells = pow(self.size, 2)
 		self.parent = None
 		self.g = 0
 
 	def getZero(self):
-		for i in range(self.size):
-			for j in range(self.size):
-				if self.field[i][j] == 0:
-					return [i, j]
+		for i in range(self.all_cells):
+			if self.field[i] == 0:
+				return i
 	
 	def getField(self):
 		return self.field
@@ -29,29 +29,29 @@ class Node():
 	def getG(self):
 		return self.g
 
-	def copyField(self):
-		field = []
-		for i in range(self.size):
-			field.append(copy.copy(self.field[i]))
-		return field
+	# def copyField(self):
+	# 	field = []
+	# 	for i in range(self.size):
+	# 		field.append(copy.copy(self.field[i]))
+	# 	return field
 
 	def getChildrens(self):
-		i,j = self.getZero()
+		pos = self.getZero()
 		childrens = []
-		if i > 0:
-			tmp_field = self.copyField()
-			tmp_field[i][j],tmp_field[i-1][j] = tmp_field[i-1][j],tmp_field[i][j]
+		if pos >= self.size:
+			tmp_field = copy(self.field)
+			tmp_field[pos],tmp_field[pos-self.size] = tmp_field[pos-self.size],0
 			childrens.append(Node(tmp_field, self.size))
-		if i < self.size - 1:
-			tmp_field = self.copyField()
-			tmp_field[i][j],tmp_field[i+1][j] = tmp_field[i+1][j],tmp_field[i][j]
+		if pos < self.all_cells - self.size:
+			tmp_field = copy(self.field)
+			tmp_field[pos],tmp_field[pos+self.size] = tmp_field[pos+self.size],0
 			childrens.append(Node(tmp_field, self.size))
-		if j > 0:
-			tmp_field = self.copyField()
-			tmp_field[i][j],tmp_field[i][j-1] = tmp_field[i][j-1],tmp_field[i][j]
+		if pos % self.size != 0:
+			tmp_field = copy(self.field)
+			tmp_field[pos],tmp_field[pos-1] = tmp_field[pos-1],0
 			childrens.append(Node(tmp_field, self.size))
-		if j < self.size - 1:
-			tmp_field = self.copyField()
-			tmp_field[i][j],tmp_field[i][j+1] = tmp_field[i][j+1],tmp_field[i][j]
+		if (pos + 1) % self.size != 0:
+			tmp_field = copy(self.field)
+			tmp_field[pos],tmp_field[pos+1] = tmp_field[pos+1],0
 			childrens.append(Node(tmp_field, self.size))
 		return childrens
