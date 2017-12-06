@@ -3,9 +3,8 @@ from Algorithms import *
 from generator import *
 from solver import *
 
-if __name__ == "__main__":
+def getRandomPath(size):
 	path = []
-	size = 4
 	while True:
 		path = make_puzzle(size, False, 10000)
 		bem = 0
@@ -19,12 +18,16 @@ if __name__ == "__main__":
 					bem += 1
 		if (size % 2 != 0 and bem % 2 == 0) or (size % 2 == 0 and bem % 2 != 0):
 			break
+	return path
 
+if __name__ == "__main__":
+	size = 4
+	# path = getRandomPath(4)
 	path = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
 	# path = [6, 5, 1, 7, 0, 3, 4, 2, 8]
-	print(path)
+	# print(path)
 	# final
-	f = Algorithms("idaStar", size, "patternDatabase2")
+	f = Algorithms("idaStar", size, "patternDatabase")
 	rez = f.solve(Node(path, size))
 	print("TIME FINAL = ", rez['time'])
 	# first
