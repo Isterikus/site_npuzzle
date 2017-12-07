@@ -22,12 +22,13 @@ def getRandomPath(size):
 
 if __name__ == "__main__":
 	size = 4
-	# path = getRandomPath(4)
+	path = getRandomPath(size)
+	# print(path)
 	path = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
 	# path = [6, 5, 1, 7, 0, 3, 4, 2, 8]
 	# print(path)
 	# final
-	f = Algorithms("idaStar", size, "patternDatabase")
+	f = Algorithms("idaStar", size, "manhattan+linear2")
 	rez = f.solve(Node(path, size))
 	print("TIME FINAL = ", rez['time'])
 	# first

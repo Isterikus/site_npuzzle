@@ -17,14 +17,14 @@ class Algorithms():
 		if current.field == self.goal:
 			return current
 		for children in current.getChildrens():
-				children.setParent(current)
-				temp = time()
-				h = self.heuristics.getH(children.field)
-				self.heu_time += time() - temp
-				if children.getG() + h <= bound:
-					rez = self.depthFirstSearch(children, bound)
-					if rez != None:
-						return rez
+			children.setParent(current)
+			temp = time()
+			h = self.heuristics.getH(children.field)
+			self.heu_time += time() - temp
+			if children.getG() + h <= bound:
+				rez = self.depthFirstSearch(children, bound)
+				if rez != None:
+					return rez
 		return None
 
 	def idaStar(self, startNode):
