@@ -18,7 +18,7 @@ class Node():
 
 	def setParent(self, parent):
 		self.parent = parent
-		self.g = parent.getG() + 1
+		# self.g = parent.getG() + 1
 
 	def getParent(self):
 		return self.parent
@@ -41,18 +41,38 @@ class Node():
 		if pos >= self.size:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos-self.size] = tmp_field[pos-self.size],0
+			child = Node(tmp_field, self.size)
+			if tmp_field[pos] != -1:
+				child.setG(self.getG() + 1)
+			else:
+				child.setG(self.getG())
 			childrens.append(Node(tmp_field, self.size))
 		if pos < self.all_cells - self.size:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos+self.size] = tmp_field[pos+self.size],0
+			child = Node(tmp_field, self.size)
+			if tmp_field[pos] != -1:
+				child.setG(self.getG() + 1)
+			else:
+				child.setG(self.getG())
 			childrens.append(Node(tmp_field, self.size))
 		if pos % self.size != 0:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos-1] = tmp_field[pos-1],0
+			child = Node(tmp_field, self.size)
+			if tmp_field[pos] != -1:
+				child.setG(self.getG() + 1)
+			else:
+				child.setG(self.getG())
 			childrens.append(Node(tmp_field, self.size))
 		if (pos + 1) % self.size != 0:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos+1] = tmp_field[pos+1],0
+			child = Node(tmp_field, self.size)
+			if tmp_field[pos] != -1:
+				child.setG(self.getG() + 1)
+			else:
+				child.setG(self.getG())
 			childrens.append(Node(tmp_field, self.size))
 		i = 0
 		while i < len(childrens):
