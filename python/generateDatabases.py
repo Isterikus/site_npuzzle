@@ -30,7 +30,7 @@ class patternDatabase():
 		index = 0
 		for val in field:
 			position = self.getPosition(val)
-			if (position != -1):
+			if (position > 0):
 				index |= i << (position << 2)
 			i += 1
 		return index
@@ -43,26 +43,55 @@ class patternDatabase():
 			if self.cache[h] > node.getG():
 				self.cache[h] = node.getG()
 
-def bfs(initial):
-	print(initial)
-	db = patternDatabase(initial)
-	visited, queque = [], collections.deque([initial])
-	i = 0
-	while queque:
-		current = queque.popleft()
+# def bfs(root):
+# 	db = patternDatabase(root)
+# 	visited, queue = set(), collections.deque([root])
+# 	while queue:
+# 		vertex = queue.popleft()
+# 		db.addNode(vertex)
+# 		if vertex.getG() > maxtraindep:
+# 			break
+# 		for neighbour in vertex.getChildrens():
+# 			neighbour.setParent(vertex)
+# 			if (neighbour.field) not in visited:
+# 				visited.add((neighbour.field))
+# 				queue.append(neighbour)
+# 	return db
+
+def bfs(pattern):
+	db = patternDatabase(pattern)
+	frontier = deque() # FIFO queue
+	visited = set()
+	visited.add((db.hash(pattern), pattern.getZero()))
+	frontier.append(pattern)
+
+	while frontier:
+		current = frontier.popleft()
 		db.addNode(current)
-		if current.getG() > maxtraindep:
-			break
-		if i % 10 == 0:
-			print(db.cache)
-			# break
-		i += 1
-		for neighbor in current.getChildrens():
-			neighbor.setParent(current)
-			if neighbor.field not in visited:
-				queque.append(neighbor)
-				visited.append(neighbor.field)
+
+		if current.getG() > maxtraindep: break
+
+		for child in current.getChildrens():
+			child = current.move(direction)
+			if not child: continue
+
+			if (child.coding,child.blank) not in visited:
+				frontier.append(child)
+				visited.add((child.coding, child.blank))
 	return db
+
+# def bfs(initial):
+# 	visited, queque = set(), [initial]
+# 	while queque:
+# 		vertex = queque.pop(0)
+# 		if vertex.getG() > maxtraindep:
+# 			break
+# 		if vertex.field not in [node.field for node in visited]:
+# 			visited.add(vertex)
+# 			for children in vertex.getChildrens():
+# 				children.setParent(vertex)
+# 				queque.append(children)
+# 	return db
 
 
 def generate(databases):
