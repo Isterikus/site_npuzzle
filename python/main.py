@@ -1,4 +1,4 @@
-from Node import *
+from Node2 import *
 from Algorithms import *
 from generator import *
 from solver import *
