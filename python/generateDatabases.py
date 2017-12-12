@@ -1,4 +1,4 @@
-import collections
+from collections import deque
 
 from Node import *
 
@@ -13,7 +13,9 @@ def check_not_in(node, arr):
 		if el.field == node.field:
 			return False
 	return True
-maxtraindep = 18
+
+maxtraindep = 11
+
 class patternDatabase():
 	def __init__(self, pattern):
 		self.pattern = pattern
@@ -62,22 +64,28 @@ def bfs(pattern):
 	db = patternDatabase(pattern)
 	frontier = deque() # FIFO queue
 	visited = set()
-	visited.add((db.hash(pattern), pattern.getZero()))
+	visited.add((db.hash(pattern.field), pattern.getZero()))
 	frontier.append(pattern)
 
+	# i = 0
 	while frontier:
 		current = frontier.popleft()
 		db.addNode(current)
 
-		if current.getG() > maxtraindep: break
-
+		if current.getG() > maxtraindep:
+			break
+		# i += 1
 		for child in current.getChildrens():
-			child = current.move(direction)
-			if not child: continue
-
-			if (child.coding,child.blank) not in visited:
+			child.setParent(current)
+			h = db.hash(child.field)
+			if (h,child.getZero()) not in visited:
 				frontier.append(child)
-				visited.add((child.coding, child.blank))
+				visited.add((h, child.getZero()))
+		# if i == 1:
+		# 	print("----------------------- CLOSED")
+		# 	print(visited)
+		# 	print("----------------------- OPEN")
+		# 	print([db.hash(node.field) for node in frontier])
 	return db
 
 # def bfs(initial):
