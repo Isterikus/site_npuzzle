@@ -3,6 +3,7 @@ from Algorithms import *
 from generator import *
 from solver import *
 
+
 def getRandomPath(size):
 	path = []
 	while True:
@@ -19,6 +20,7 @@ def getRandomPath(size):
 		if (size % 2 != 0 and bem % 2 == 0) or (size % 2 == 0 and bem % 2 != 0):
 			break
 	return path
+
 
 if __name__ == "__main__":
 	size = 4

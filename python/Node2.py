@@ -1,13 +1,12 @@
-import test
+# import test
+from itertools import product
 
-import CONSTANTS
-
-board_size = CONSTANTS.board_size
-N = CONSTANTS.N
-loops = CONSTANTS.loops
+board_size = 4
+N = pow(board_size, 2) - 1
+loops = list(product(range(board_size), range(board_size)))
 
 class Node:
-	offsets = { "N": (-1,  0),
+	offsets = {"N": (-1,  0),
 				"S": ( 1,  0),
 				"W": ( 0, -1),
 				"E": ( 0,  1)}
@@ -24,8 +23,8 @@ class Node:
 	# return the coding with all tiles not in the pattern masked
 	def mask(self, pattern):
 		masked = self.coding
-		for r,c in loops:
-			if self.at(r,c) not in pattern:
+		for r, c in loops:
+			if self.at(r, c) not in pattern:
 				masked &= ~(N << ((r * 4 + c) * 4))
 		return masked
 
@@ -76,3 +75,15 @@ class Node:
 			string += "\n"
 		string += "-------------------\n"
 		return string
+
+
+def parse_state(statestr):
+	state = Node(0, (3, 3))
+	for r, c in loops:
+		state.set(r, c, statestr[r][c])
+	return state
+
+
+goal = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]
+goal = parse_state(goal)
+print(goal.coding)
