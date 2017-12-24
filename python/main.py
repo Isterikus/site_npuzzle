@@ -1,8 +1,7 @@
-from Node2 import *
-from Algorithms import *
-from generator import *
-from solver import *
+from subprocess import call
 
+from .Algorithms import *
+from .generator import *
 
 def getRandomPath(size):
 	path = []
@@ -22,16 +21,30 @@ def getRandomPath(size):
 	return path
 
 
+def from_site(size, path):
+	# path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
+	print(size)
+	f = Algorithms("idaStar", size, "manhattan+linear2")
+	rez = f.solve(path)
+	to_c = ""
+	for el in path:
+		to_c += "," + str(el)
+	to_c = to_c[1:]
+	call(["./a.out", str(size), to_c])
+	print("TIME = ", rez['time'])
+	return rez['time']
+
 if __name__ == "__main__":
 	size = 4
 	path = getRandomPath(size)
 	# print(path)
-	path = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
+	path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
 	# path = [6, 5, 1, 7, 0, 3, 4, 2, 8]
 	# print(path)
 	# final
+	# f = Algorithms("idaStar", size, "patternDatabase")
 	f = Algorithms("idaStar", size, "manhattan+linear2")
-	rez = f.solve(Node(path, size))
+	rez = f.solve(path)
 	print("TIME FINAL = ", rez['time'])
 	# first
 	# rez2 = from_site(size, path, False)

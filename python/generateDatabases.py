@@ -75,7 +75,7 @@ def train_pattern(goal, pattern):
 				child.setG(current.getG() + 1)
 			else:
 				child.setG(current.getG())
-			child_code = child.code()
+			child_code = child.code(pattern)
 			if (child_code, child_zero) not in visited:
 				frontier.append(child)
 				visited.add((child_code, child_zero))

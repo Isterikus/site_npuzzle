@@ -1,6 +1,6 @@
 from time import time
-from Heuristics import *
-from Node import *
+from .Heuristics import *
+from .Node import *
 
 class Algorithms():
 	def __init__(self, algorithm, size, heuristics):
@@ -9,7 +9,6 @@ class Algorithms():
 		self.algorithm = algorithm
 		self.size = size
 		self.heuristics = Heuristics(heuristics, size)
-		self.heu_time = 0
 	
 	# IDA* START
 
@@ -18,9 +17,8 @@ class Algorithms():
 			return current
 		for children in current.getChildrens():
 			children.setParent(current)
-			temp = time()
-			h = self.heuristics.getH(children.field)
-			self.heu_time += time() - temp
+			children.setG(current.getG() + 1)
+			h = self.heuristics.getH(children)
 			if children.getG() + h <= bound:
 				rez = self.depthFirstSearch(children, bound)
 				if rez != None:
@@ -28,7 +26,7 @@ class Algorithms():
 		return None
 
 	def idaStar(self, startNode):
-		bound = self.heuristics.getH(startNode.field)
+		bound = self.heuristics.getH(startNode)
 		solution = None
 		startTime = time()
 		while solution == None:
@@ -37,12 +35,12 @@ class Algorithms():
 			# print("B=  ", bound)
 		finish_time = time() - startTime
 		print("PYTHON_IDA* TIME = ", finish_time)
-		print("HEU TIME = ", self.heu_time)
 		return {'time':finish_time,'solution':solution}
 
 	# IDA* END
 
-	def solve(self, startNode):
+	def solve(self, startField):
+		startNode = Node(startField, self.size)
 		if self.algorithm == "idaStar":
 			return self.idaStar(startNode)
 

@@ -1,5 +1,4 @@
-from time import time
-from Node import *
+# from json import load
 
 class Heuristics():
 	def __init__(self, heuristics, size):
@@ -8,6 +7,15 @@ class Heuristics():
 		self.all_cells = pow(size, 2)
 		self.real_positions = [{} for i in range(self.all_cells)]
 		self.realPositions()
+		# self.patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]]
+		# self.databases = []
+		# for i in range(2):
+		# 	if i == 0:
+		# 		file = "DATABASE_7_8-1"
+		# 	else:
+		# 		file = "DATABASE_7_8-2"
+		# 	with open("../databases/" + file, 'r') as f:
+		# 		self.databases.append(load(f))
 
 	def realPositions(self):
 		for c in range(1, self.all_cells):
@@ -55,29 +63,14 @@ class Heuristics():
 						h += 2
 		return h
 
-	def check_pattern(self, field, pattern):
-		for i in range(self.all_cells - 1):
-			if pattern[i] != -1 and field.field[i] != pattern[i]:
-				return False
-		return True
-
-	def bfs(self, current, pattern):
-		if self.check_pattern(current, pattern):
-			return current.getG()
-		for children in current.getChildrens():
-			children.setParent(current)
-			rez = self.bfs(children, pattern)
-			if rez != None:
-				return rez
-		return None
-
-	def patternDatabase(self, field):
-		base = [[1,2,3,4,5,-1,-1,-1,9,-1,-1,-1,13,-1,-1],[-1,-1,-1,-1,-1,6,7,8,-1,10,11,12,-1,14,15]]
-		h = [0,0]
-		start = Node(field, self.size)
-		h[0] = self.bfs(start, base[0])
-		h[1] = self.bfs(start, base[1])
-		return max(h)
+	def patternDatabase(self, node):
+		ret = 0
+		for i in range(2):
+			if node.code(self.patterns[i]) in self.databases:
+				ret += self.databases[i][node.code(self.patterns[i])]
+			else:
+				return self.manhattan(node.field) + self.linear2(node.field)
+		return ret
 
 	def test(self, arr, val):
 		i = 0
@@ -86,17 +79,17 @@ class Heuristics():
 				return i
 			i += 1
 
-	def getH(self, field):
+	def getH(self, node):
 		h = 0
 		for heuristic in self.heuristics.split('+'):
 			if heuristic == "manhattan":
-				h += self.manhattan(field)
+				h += self.manhattan(node.field)
 			elif heuristic == "linear":
-				h += self.linear(field)
+				h += self.linear(node.field)
 			elif heuristic == "linear2":
-				h += self.linear2(field)
+				h += self.linear2(node.field)
 			elif heuristic == "patternDatabase":
-				h += self.patternDatabase(field)
+				h += self.patternDatabase(node)
 		return h
 
 # field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]

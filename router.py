@@ -3,8 +3,9 @@ from flask import Flask, jsonify, request, url_for, render_template
 from flask_cors import CORS
 import json
 
-from python.generator import *
-from python.solver import *
+# from python.generator import *
+from python.main import *
+# from python.solver import *
 
 app = Flask(__name__)
 CORS(app)
@@ -24,10 +25,10 @@ def rand():
 
 @app.route('/solve', methods=['POST'])
 def solve():
-	print(request.values);
+	print(request.values)
 	initial_field = [int(i) for i in request.values['field'].split(',')]
 	print(initial_field)
-	rez = from_site(int(request.values['size']), initial_field, True)
+	rez = from_site(int(request.values['size']), initial_field)
 	print("TIME = ", rez)
 	return json.dumps({"time": rez})
 

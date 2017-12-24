@@ -283,8 +283,6 @@ void	solve(int *initial_field)
 	t_state	*initial;
 	int		bound;
 	int		t;
-	struct timeval stop, start;
-	gettimeofday(&start, NULL);
 	initial = (t_state *)malloc(sizeof(t_state));
 	initial->g = 0;
 	initial->field = initial_field;
@@ -298,11 +296,40 @@ void	solve(int *initial_field)
 			break;
 		bound += 2;
 	}
-	gettimeofday(&stop, NULL);
-	double secs;
-	secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
-	printf("C TIME %f\n",secs);
 	free(initial);
+}
+
+int     python(int sz, char *field)
+{
+    int		*initial_field;
+	int		i;
+	int		j;
+	struct timeval stop, start;
+	double secs;
+
+	gettimeofday(&start, NULL);
+	n = sz;
+	size = n * n;
+	initial_field = (int *)malloc(sizeof(int) * size);
+	i = 0;
+	j = 0;
+	while (field[i])
+	{
+		initial_field[j] = 0;
+		while (field[i] && field[i] != ',')
+			initial_field[j] = initial_field[j] * 10 + field[i++] - 48;
+		if (field[i])
+			i++;
+		j++;
+	}
+	solve(initial_field);
+	gettimeofday(&stop, NULL);
+	secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
+	free(left_range);
+	free(right_range);
+	free(top_range);
+	free(bottom_range);
+	return secs;
 }
 
 int		main(int argc, char const *argv[])
