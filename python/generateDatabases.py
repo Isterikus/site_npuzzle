@@ -1,4 +1,6 @@
 from collections import deque
+from time import clock
+from json import dump
 
 from Node import Node
 
@@ -64,15 +66,19 @@ def train_pattern(goal, pattern):
 		current = frontier.popleft()
 		db.add(current)
 
-		if current.cost > max_train_dep: break
+		if current.getG() > max_train_dep: break
 
-		for direction in directions:
-			child = current.move(direction)
-			if not child: continue
-
-			if (child.coding,child.blank) not in visited:
+		for child in current.getChildrens():
+			child.setParent(current)
+			child_zero = child.getZero()
+			if current.field[child_zero] in pattern:
+				child.setG(current.getG() + 1)
+			else:
+				child.setG(current.getG())
+			child_code = child.code()
+			if (child_code, child_zero) not in visited:
 				frontier.append(child)
-				visited.add((child.coding, child.blank))
+				visited.add((child_code, child_zero))
 	return db
 
 
@@ -82,6 +88,7 @@ def train():
 	goal = Node(goal, size)
 	for pattern in patterns:
 		pdbs.append(train_pattern(goal, pattern))
+		print("DB CACHED")
 
 
 # def generate(databases):
@@ -94,5 +101,15 @@ def train():
 # 		print(rez)
 
 
-# if __name__ == '__main__':
-	# generate(database_6_6_3['db'])
+if __name__ == '__main__':
+	t = clock()
+	train()
+	print("Training time: ", clock() - t, " cpu seconds")
+	for i in range(2):
+		if i == 0:
+			file = "DATABASE_7_8-1"
+		else:
+			file = "DATABASE_7_8-2"
+		with open("../databases/" + file, 'w') as out:
+			print("CACHE LEN = ", len(pdbs[i].cache))
+			dump(pdbs[i].cache, out)
