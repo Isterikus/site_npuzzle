@@ -85,6 +85,8 @@ var minSize = 3;
 var maxSize = 6;
 var algoTypes = [{'val': 'adaStar', 'text': 'ADA*'}, {'val': 'ada', 'text': 'A*'}];
 var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
+var solution = "";
+var tile_size = 61;
 
 function setPuzzle() {
 	var size = Number($('#size').val());
@@ -129,12 +131,50 @@ function request(page, dataSend) {
 		url: page,
 		data: dataSend,
 		success: function (translated) {
-			console.log('TR = ', translated);
-			ret = translated;
+			// console.log('TR = ', translated);
+			ret = $.parseJSON(translated);
+			// return translated;
 		},
 		async:false
 	});
 	return ret;
+}
+
+function parse_tile(tile) {
+	tile = tile.split('-');
+	return {'i': parseInt(tile[1]), 'j': parseInt(tile[2])}
+}
+
+function animate_tile(move) {
+	zero_animate = {}
+	tile_animate = {}
+	if (move == 'l') {
+		zero_animate = {left: "-=" + tile_size}
+	}
+
+	$("#" + id).animate({
+		left: "-=",
+		}, 5000, function() {
+		// Animation complete.
+	});
+}
+
+function play_solution() {
+	if (solution != "") {
+		for (var i = 0, len = str.length; i < len; i++) {
+			move = str.charAt(i);
+			now_zero = parse_tile(document.getElementsByClassName("empty")[0].id);
+			if (move == 'l') {
+				tile_move = "tile-" + now_zero['i'] + "-" + (now_zero[j] - 1);
+			} else if (move == 'r') {
+				tile_move = "tile-" + now_zero['i'] + "-" + (now_zero[j] + 1);
+			} else if (move == 't') {
+				tile_move = "tile-" + (now_zero['i'] - 1) + "-" + now_zero[j];
+			} else {
+				tile_move = "tile-" + (now_zero['i'] + 1) + "-" + now_zero[j];
+			}
+		}
+	}
 }
 
 $('#size').change(function () {
@@ -196,9 +236,11 @@ $('#solve').click(function () {
 	}
 	console.log(field);
 	data = {size: size, field: field, manhattan: manhattan, linear: linear, patternDatabase: patternDatabase};
-	ret = eval(request('solve', data));
-	console.log(ret['time']);
-	$("#timePython").html(ret['time']);
+	ret = request('solve', data);
+	$("#timePython").html(ret['python_time']);
+	$("#timeC").html(ret['c_time']);
+	$('#moves').html(ret['solution'].length);
+	solution = ret['solution'];
 });
 
 $(document).ready(function () {

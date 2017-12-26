@@ -23,11 +23,30 @@ def getRandomPath(size):
 	return path
 
 
+def parse_solve(node):
+	solution = ""
+	prev = node
+	node = node.parent
+	while node != None:
+		diff = prev.getZero() - node.getZero()
+		if diff == -1:
+			solution += 'l'
+		elif diff == 1:
+			solution += 'r'
+		elif diff < 0:
+			solution += 't'
+		else:
+			solution += 'b'
+		prev = node
+		node = node.parent
+	return solution
+
 def from_site(size, path):
 	path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
 	print(size)
 	f = Algorithms("idaStar", size, "manhattan+linear2")
 	rez = f.solve(path)
+	solution = parse_solve(rez['solution'])
 	to_c = ""
 	for el in path:
 		to_c += "," + str(el)
@@ -42,7 +61,7 @@ def from_site(size, path):
 	print("C TIME = ", c_time)
 	# call(["./a.out", str(size), to_c])
 	print("TIME = ", rez['time'])
-	return {'c_time': c_time, 'python_time': rez['time']}
+	return {'c_time': c_time, 'python_time': rez['time'], 'solution': solution}
 	# return {'time': rez['time']}
 
 if __name__ == "__main__":
