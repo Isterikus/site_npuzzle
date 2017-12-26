@@ -36,7 +36,7 @@ body {
 	margin-bottom: 10px;
 }
 
-#puzzle {
+.puzzleTable {
 	overflow: hidden;
 	/*padding: 5px;*/
 	padding-bottom: 0px;

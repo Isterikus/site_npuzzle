@@ -17,12 +17,15 @@
 		<div id="puzzle" class="puzzleTable">
 		</div>
 		<div id="actionsBar">
+			<button class="btn btn-primary actionButtons" id="custom">Custom input</button>
 			<button class="btn btn-primary actionButtons" id="random">Make it random!</button>
 			<button class="btn btn-success actionButtons" id="solve">Solve!</button>
 			<button class="btn btn-primary actionButtons" id="play">Play the result!</button>
 		</div>
 	</div>
-
+	<div class="col-sm-12 col-md-6" id="customInput">
+		<div id="puzzleInput" class="puzzleTable"></div>
+	</div>
 	<div class="col-sm-12 col-md-4">
 		<div class="info choice col-sm-12">
 			<form action="#">
@@ -64,15 +67,15 @@
 			<h3 class="h_main col-sm-12">Results</h3>
 			<div class="col-sm-12">
 				<label for="moves" class="col-sm-5">Number of moves:</label>
-				<span id="moves" class="col-sm-7">1</span>
+				<span id="moves" class="col-sm-7"></span>
 			</div>
 			<div class="col-sm-12">
 				<label for="timePython" class="col-sm-5">Time Python:</label>
-				<span id="timePython" class="col-sm-7">1</span>
+				<span id="timePython" class="col-sm-7"></span>
 			</div>
 			<div class="col-sm-12">
 				<label for="timeC" class="col-sm-5">Time C:</label>
-				<span id="timeC" class="col-sm-7">1</span>
+				<span id="timeC" class="col-sm-7"></span>
 			</div>
 		</div>
 	</div>
@@ -157,27 +160,19 @@ function animate_tile(move) {
 	zero_animate = {}
 	tile_animate = {}
 	if (move == 'l') {
-		tile_animate = {left: "-=" + tile_size};
-		zero_animate = {left: "+=" + tile_size};
-	} else if (move == 'r') {
 		tile_animate = {left: "+=" + tile_size};
 		zero_animate = {left: "-=" + tile_size};
+	} else if (move == 'r') {
+		tile_animate = {left: "-=" + tile_size};
+		zero_animate = {left: "+=" + tile_size};
 	} else if (move == 't') {
-		tile_animate = {top: "-=" + tile_size};
-		zero_animate = {top: "+=" + tile_size};
-	} else {
 		tile_animate = {top: "+=" + tile_size};
+		zero_animate = {top: "-=" + tile_size};
+	} else {
+		tile_animate = {top: "-=" + tile_size};
 		zero_animate = {top: "+=" + tile_size};
 	}
 	return {'tile': tile_animate, 'zero': zero_animate};
-}
-
-function delay(time) {
-	var d1 = new Date();
-	var d2 = new Date();
-	while (d2.valueOf() < d1.valueOf() + time) {
-		d2 = new Date();
-	}
 }
 
 function play_solution() {
@@ -223,13 +218,16 @@ function delay_loop(i) {
 			tile_move = "#tile-" + (now_zero['i'] + 1) + "-" + now_zero['j'];
 		}
 		anim = animate_tile(move);
+		console.log("MOVE = ", move, " | ANIMATE = ", anim['tile'], " | TILE = ", tile_move, " | ZERO = ", now_zero);
 		$(tile_move).animate(anim['tile'], 500, function() {
 			// Animation complete.
 		});
+		console.log("TILE N_ID = ", zero_id, " | ZERO N_ID = ", tile_move);
 		$(tile_move).attr('id', zero_id);
+		tile_move = tile_move.substr(1);
 		document.getElementsByClassName("empty")[0].id = tile_move;
 
-        // recursive call 
+        // recursive call
         if (i < solution.length)
             delay_loop(i + 1);
 
@@ -240,6 +238,33 @@ $('#play').click(play_solution);
 
 $('#size').change(function () {
 	setPuzzle();
+});
+
+$('#customInput').hide();
+
+$('#custom').click(function() {
+	var size = Number($('#size').val());
+	var field = $('#puzzleInput');
+
+	field.html('');
+	// field.css('height', 195);
+	field.css('width', size * 61 + 18);
+	var c = 1;
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			$('#puzzle').append("<input type='Number' class='tile' id='tile-" + i + "-" + j + "'>" + c + "</div>");
+			c++;
+		}
+	}
+	$('#puzzle').css('height', $('#puzzle').css('width'));
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			$('#tile-' + i + '-' + j).css('top', field_static + i * tile_size);
+			$('#tile-' + i + '-' + j).css('left', field_static + j * tile_size);
+			c++;
+		}
+	}
+	$('#customInput').show();
 });
 
 $('#random').click(function () {
@@ -291,8 +316,8 @@ $('#random').click(function () {
 				val = Math.pow(size, 2);
 			}
 			console.log("HERE EPT", path[c]);
-			$(tile).css('left', field_static + i * tile_size);
-			$(tile).css('top', field_static + j * tile_size);
+			$(tile).css('left', field_static + j * tile_size);
+			$(tile).css('top', field_static + i * tile_size);
 			c++;
 		}
 	}
