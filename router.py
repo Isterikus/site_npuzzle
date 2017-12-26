@@ -18,7 +18,7 @@ def main():
 @app.route('/rand', methods=['POST'])
 def rand():
 	print(request.values)
-	path2 = make_puzzle(int(request.values['size']), True, 10000)
+	path2 = getRandomPath(int(request.values['size']))
 	print(path2)
 	# ret = [str(i)+"," for i in path2]
 	return json.dumps(path2)

@@ -87,6 +87,7 @@ var algoTypes = [{'val': 'adaStar', 'text': 'ADA*'}, {'val': 'ada', 'text': 'A*'
 var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
 var solution = "";
 var tile_size = 61;
+var field_static = 5;
 
 function setPuzzle() {
 	var size = Number($('#size').val());
@@ -107,6 +108,13 @@ function setPuzzle() {
 	}
 	$('#puzzle').append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
 	$('#puzzle').css('height', $('#puzzle').css('width'));
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			$('#tile-' + i + '-' + j).css('top', field_static + i * tile_size);
+			$('#tile-' + i + '-' + j).css('left', field_static + j * tile_size);
+			c++;
+		}
+	}
 }
 
 function setSize() {
@@ -149,33 +157,86 @@ function animate_tile(move) {
 	zero_animate = {}
 	tile_animate = {}
 	if (move == 'l') {
-		zero_animate = {left: "-=" + tile_size}
+		tile_animate = {left: "-=" + tile_size};
+		zero_animate = {left: "+=" + tile_size};
+	} else if (move == 'r') {
+		tile_animate = {left: "+=" + tile_size};
+		zero_animate = {left: "-=" + tile_size};
+	} else if (move == 't') {
+		tile_animate = {top: "-=" + tile_size};
+		zero_animate = {top: "+=" + tile_size};
+	} else {
+		tile_animate = {top: "+=" + tile_size};
+		zero_animate = {top: "+=" + tile_size};
 	}
+	return {'tile': tile_animate, 'zero': zero_animate};
+}
 
-	$("#" + id).animate({
-		left: "-=",
-		}, 5000, function() {
-		// Animation complete.
-	});
+function delay(time) {
+	var d1 = new Date();
+	var d2 = new Date();
+	while (d2.valueOf() < d1.valueOf() + time) {
+		d2 = new Date();
+	}
 }
 
 function play_solution() {
+	console.log("SOL = ", solution);
 	if (solution != "") {
-		for (var i = 0, len = str.length; i < len; i++) {
-			move = str.charAt(i);
-			now_zero = parse_tile(document.getElementsByClassName("empty")[0].id);
-			if (move == 'l') {
-				tile_move = "tile-" + now_zero['i'] + "-" + (now_zero[j] - 1);
-			} else if (move == 'r') {
-				tile_move = "tile-" + now_zero['i'] + "-" + (now_zero[j] + 1);
-			} else if (move == 't') {
-				tile_move = "tile-" + (now_zero['i'] - 1) + "-" + now_zero[j];
-			} else {
-				tile_move = "tile-" + (now_zero['i'] + 1) + "-" + now_zero[j];
-			}
-		}
+		delay_loop(0);
+		// for (var i = 0, len = solution.length; i < len; i++) {
+		// 	move = solution.charAt(i);
+		// 	zero_id = document.getElementsByClassName("empty")[0].id;
+		// 	now_zero = parse_tile(zero_id);
+		// 	if (move == 'l') {
+		// 		tile_move = "#tile-" + now_zero['i'] + "-" + (now_zero['j'] - 1);
+		// 	} else if (move == 'r') {
+		// 		tile_move = "#tile-" + now_zero['i'] + "-" + (now_zero['j'] + 1);
+		// 	} else if (move == 't') {
+		// 		tile_move = "#tile-" + (now_zero['i'] - 1) + "-" + now_zero['j'];
+		// 	} else {
+		// 		tile_move = "#tile-" + (now_zero['i'] + 1) + "-" + now_zero['j'];
+		// 	}
+		// 	anim = animate_tile(move);
+		// 	$(tile_move).animate(anim['tile'], 500, function() {
+		// 		// Animation complete.
+		// 	});
+		// 	$(tile_move).attr('id', zero_id);
+		// 	document.getElementsByClassName("empty")[0].id = tile_move;
+		// }
 	}
 }
+
+function delay_loop(i) {
+    // start a delay
+    setTimeout(function(){
+		move = solution.charAt(i);
+		zero_id = document.getElementsByClassName("empty")[0].id;
+		now_zero = parse_tile(zero_id);
+		if (move == 'l') {
+			tile_move = "#tile-" + now_zero['i'] + "-" + (now_zero['j'] - 1);
+		} else if (move == 'r') {
+			tile_move = "#tile-" + now_zero['i'] + "-" + (now_zero['j'] + 1);
+		} else if (move == 't') {
+			tile_move = "#tile-" + (now_zero['i'] - 1) + "-" + now_zero['j'];
+		} else {
+			tile_move = "#tile-" + (now_zero['i'] + 1) + "-" + now_zero['j'];
+		}
+		anim = animate_tile(move);
+		$(tile_move).animate(anim['tile'], 500, function() {
+			// Animation complete.
+		});
+		$(tile_move).attr('id', zero_id);
+		document.getElementsByClassName("empty")[0].id = tile_move;
+
+        // recursive call 
+        if (i < solution.length)
+            delay_loop(i + 1);
+
+    }, 500);
+}
+
+$('#play').click(play_solution);
 
 $('#size').change(function () {
 	setPuzzle();
@@ -186,29 +247,54 @@ $('#random').click(function () {
 	var field = $('#puzzle');
 
 	console.log('new');
-	path = eval(request('rand', {size: $('#size').val()}));
+	path = request('rand', {size: $('#size').val()});
 	console.log('PATH = ', path);
 	field.html('');
 	field.css('width', size * 61 + 18);
 	var c = 0;
 	console.log("PATH = ", path);
-	for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-			if (i == size - 1 && j == size - 1) {
-				break;
-			}
-			if (path[c] == 0) {
-				field.append("<div class='empty' id='tile-" + i + "-" + j + "'></div>");
-			} else {
-				field.append("<div class='tile' id='tile-" + i + "-" + j + "'>" + path[c] + "</div>");
-			}
-			c++;
+	for (var c = 0; c < path.length; c++) {
+		val = path[c];
+		i = c / size >> 0;
+		j = c % size;
+		console.log("I = ", i, " | j = ", j);
+		if (val == 0) {
+			field.append("<div class='empty' id='tile-" + i + "-" + j + "'></div>");
+		} else {
+			field.append("<div class='tile' id='tile-" + i + "-" + j + "'>" + path[c] + "</div>");
 		}
 	}
-	if (path[c] == 0) {
-		field.append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
-	} else {
-		field.append("<div class='tile' id='tile-" + (size - 1) + "-" + (size - 1) + "'>" + path[c] + "</div>");
+	// for (var i = 0; i < size; i++) {
+	// 	for (var j = 0; j < size; j++) {
+	// 		if (i == size - 1 && j == size - 1) {
+	// 			break;
+	// 		}
+	// 		if (path[c] == 0) {
+	// 			field.append("<div class='empty' id='tile-" + i + "-" + j + "'></div>");
+	// 		} else {
+	// 			field.append("<div class='tile' id='tile-" + i + "-" + j + "'>" + path[c] + "</div>");
+	// 		}
+	// 		c++;
+	// 	}
+	// }
+	// if (path[c] == 0) {
+	// 	field.append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
+	// } else {
+	// 	field.append("<div class='tile' id='tile-" + (size - 1) + "-" + (size - 1) + "'>" + path[c] + "</div>");
+	// }
+	c = 0;
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			tile = '#tile-' + i + '-' + j;
+			val = parseInt($(tile).html());
+			if (!val) {
+				val = Math.pow(size, 2);
+			}
+			console.log("HERE EPT", path[c]);
+			$(tile).css('left', field_static + i * tile_size);
+			$(tile).css('top', field_static + j * tile_size);
+			c++;
+		}
 	}
 	// $('#puzzle').css('height', $('#puzzle').css('width'));
 });
