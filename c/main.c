@@ -299,15 +299,12 @@ void	solve(int *initial_field)
 	free(initial);
 }
 
-int     python(int sz, char *field)
+void     python(int sz, char *field)
 {
     int		*initial_field;
 	int		i;
 	int		j;
-	struct timeval stop, start;
-	double secs;
 
-	gettimeofday(&start, NULL);
 	n = sz;
 	size = n * n;
 	initial_field = (int *)malloc(sizeof(int) * size);
@@ -323,13 +320,10 @@ int     python(int sz, char *field)
 		j++;
 	}
 	solve(initial_field);
-	gettimeofday(&stop, NULL);
-	secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
 	free(left_range);
 	free(right_range);
 	free(top_range);
 	free(bottom_range);
-	return secs;
 }
 
 int		main(int argc, char const *argv[])
@@ -341,7 +335,7 @@ int		main(int argc, char const *argv[])
 	if (argc != 3)
 		return 0;
 	printf("START C\n");
-	n = ft_atoi(argv[1]);
+	n = atoi(argv[1]);
 	size = n * n;
 	initial_field = (int *)malloc(sizeof(int) * size);
 	i = 0;

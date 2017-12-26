@@ -29,8 +29,8 @@ def solve():
 	initial_field = [int(i) for i in request.values['field'].split(',')]
 	print(initial_field)
 	rez = from_site(int(request.values['size']), initial_field)
-	print("TIME = ", rez)
-	return json.dumps({"time": rez})
+	# print("TIME = ", rez[''])
+	return json.dumps(rez)
 
 if __name__ == '__main__':
 	app.run(debug=True)

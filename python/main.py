@@ -1,4 +1,6 @@
-from subprocess import call
+# from subprocess import call
+from time import time
+from ctypes import *
 
 from .Algorithms import *
 from .generator import *
@@ -22,7 +24,7 @@ def getRandomPath(size):
 
 
 def from_site(size, path):
-	# path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
+	path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
 	print(size)
 	f = Algorithms("idaStar", size, "manhattan+linear2")
 	rez = f.solve(path)
@@ -30,9 +32,18 @@ def from_site(size, path):
 	for el in path:
 		to_c += "," + str(el)
 	to_c = to_c[1:]
-	call(["./a.out", str(size), to_c])
+
+	print("to c = ", to_c)
+	c_module = CDLL('./adder.so')
+	to_c = c_char_p(to_c.encode('utf-8'))
+	start_c = time()
+	c_module.python(size, to_c)
+	c_time = time() - start_c
+	print("C TIME = ", c_time)
+	# call(["./a.out", str(size), to_c])
 	print("TIME = ", rez['time'])
-	return rez['time']
+	return {'c_time': c_time, 'python_time': rez['time']}
+	# return {'time': rez['time']}
 
 if __name__ == "__main__":
 	size = 4
