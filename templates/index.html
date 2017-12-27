@@ -23,9 +23,6 @@
 			<button class="btn btn-primary actionButtons" id="play">Play the result!</button>
 		</div>
 	</div>
-	<div class="col-sm-12 col-md-6" id="customInput">
-		<div id="puzzleInput" class="puzzleTable"></div>
-	</div>
 	<div class="col-sm-12 col-md-4">
 		<div class="info choice col-sm-12">
 			<form action="#">
@@ -92,7 +89,7 @@ var solution = "";
 var tile_size = 61;
 var field_static = 5;
 
-function setPuzzle() {
+function setPuzzle(custom) {
 	var size = Number($('#size').val());
 	var field = $('#puzzle');
 
@@ -102,19 +99,29 @@ function setPuzzle() {
 	var c = 1;
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
-			if (i == size - 1 && j == size - 1) {
+			if (i == size - 1 && j == size - 1 && !custom) {
 				break;
 			}
-			$('#puzzle').append("<div class='tile' id='tile-" + i + "-" + j + "'>" + c + "</div>");
+			if (custom) {
+				$('#puzzleInput').append("<input type='Number' class='tile' id='input-" + i + "-" + j + "'>");
+			} else {
+				$('#puzzle').append("<div class='tile' id='tile-" + i + "-" + j + "'>" + c + "</div>");
+			}
 			c++;
 		}
 	}
-	$('#puzzle').append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
+	if (!custom) {
+		$('#puzzle').append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
+	}
 	$('#puzzle').css('height', $('#puzzle').css('width'));
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
-			$('#tile-' + i + '-' + j).css('top', field_static + i * tile_size);
-			$('#tile-' + i + '-' + j).css('left', field_static + j * tile_size);
+			if (custom) {
+
+			} else {
+				$('#tile-' + i + '-' + j).css('top', field_static + i * tile_size);
+				$('#tile-' + i + '-' + j).css('left', field_static + j * tile_size);
+			}
 			c++;
 		}
 	}
@@ -179,26 +186,6 @@ function play_solution() {
 	console.log("SOL = ", solution);
 	if (solution != "") {
 		delay_loop(0);
-		// for (var i = 0, len = solution.length; i < len; i++) {
-		// 	move = solution.charAt(i);
-		// 	zero_id = document.getElementsByClassName("empty")[0].id;
-		// 	now_zero = parse_tile(zero_id);
-		// 	if (move == 'l') {
-		// 		tile_move = "#tile-" + now_zero['i'] + "-" + (now_zero['j'] - 1);
-		// 	} else if (move == 'r') {
-		// 		tile_move = "#tile-" + now_zero['i'] + "-" + (now_zero['j'] + 1);
-		// 	} else if (move == 't') {
-		// 		tile_move = "#tile-" + (now_zero['i'] - 1) + "-" + now_zero['j'];
-		// 	} else {
-		// 		tile_move = "#tile-" + (now_zero['i'] + 1) + "-" + now_zero['j'];
-		// 	}
-		// 	anim = animate_tile(move);
-		// 	$(tile_move).animate(anim['tile'], 500, function() {
-		// 		// Animation complete.
-		// 	});
-		// 	$(tile_move).attr('id', zero_id);
-		// 	document.getElementsByClassName("empty")[0].id = tile_move;
-		// }
 	}
 }
 
@@ -243,28 +230,7 @@ $('#size').change(function () {
 $('#customInput').hide();
 
 $('#custom').click(function() {
-	var size = Number($('#size').val());
-	var field = $('#puzzleInput');
-
-	field.html('');
-	// field.css('height', 195);
-	field.css('width', size * 61 + 18);
-	var c = 1;
-	for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-			$('#puzzle').append("<input type='Number' class='tile' id='tile-" + i + "-" + j + "'>" + c + "</div>");
-			c++;
-		}
-	}
-	$('#puzzle').css('height', $('#puzzle').css('width'));
-	for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-			$('#tile-' + i + '-' + j).css('top', field_static + i * tile_size);
-			$('#tile-' + i + '-' + j).css('left', field_static + j * tile_size);
-			c++;
-		}
-	}
-	$('#customInput').show();
+	setPuzzle(true);
 });
 
 $('#random').click(function () {
@@ -289,24 +255,6 @@ $('#random').click(function () {
 			field.append("<div class='tile' id='tile-" + i + "-" + j + "'>" + path[c] + "</div>");
 		}
 	}
-	// for (var i = 0; i < size; i++) {
-	// 	for (var j = 0; j < size; j++) {
-	// 		if (i == size - 1 && j == size - 1) {
-	// 			break;
-	// 		}
-	// 		if (path[c] == 0) {
-	// 			field.append("<div class='empty' id='tile-" + i + "-" + j + "'></div>");
-	// 		} else {
-	// 			field.append("<div class='tile' id='tile-" + i + "-" + j + "'>" + path[c] + "</div>");
-	// 		}
-	// 		c++;
-	// 	}
-	// }
-	// if (path[c] == 0) {
-	// 	field.append("<div class='empty' id='tile-" + (size - 1) + "-" + (size - 1) + "'></div>");
-	// } else {
-	// 	field.append("<div class='tile' id='tile-" + (size - 1) + "-" + (size - 1) + "'>" + path[c] + "</div>");
-	// }
 	c = 0;
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
