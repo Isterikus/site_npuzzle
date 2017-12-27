@@ -92,6 +92,7 @@ var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
 var solution = "";
 var tile_size = 61;
 var field_static = 5;
+var FL = "";
 
 function setPuzzle(custom) {
 	var size = Number($('#size').val());
@@ -160,7 +161,6 @@ function request(page, dataSend) {
 		url: page,
 		data: dataSend,
 		success: function (translated) {
-			// console.log('TR = ', translated);
 			ret = $.parseJSON(translated);
 			// return translated;
 		},
@@ -194,7 +194,6 @@ function animate_tile(move) {
 }
 
 function play_solution() {
-	console.log("SOL = ", solution);
 	if (solution != "") {
 		delay_loop(0);
 	}
@@ -216,11 +215,9 @@ function delay_loop(i) {
 			tile_move = "#tile-" + (now_zero['i'] + 1) + "-" + now_zero['j'];
 		}
 		anim = animate_tile(move);
-		console.log("MOVE = ", move, " | ANIMATE = ", anim['tile'], " | TILE = ", tile_move, " | ZERO = ", now_zero);
 		$(tile_move).animate(anim['tile'], 500, function() {
 			// Animation complete.
 		});
-		console.log("TILE N_ID = ", zero_id, " | ZERO N_ID = ", tile_move);
 		$(tile_move).attr('id', zero_id);
 		tile_move = tile_move.substr(1);
 		document.getElementsByClassName("empty")[0].id = tile_move;
@@ -262,11 +259,9 @@ function validatePath(path) {
 	for (var i = 0; i < all_cells; i++) {
 		valid[i] = 0;
 	}
-	console.log("VAL = ", valid);
 	for (var i = 0; i < all_cells; i++) {
 		valid[path[i]] = 1;
 	}
-	console.log("VALCH = ", valid);
 	for (var i = 0; i < all_cells; i++) {
 		if (valid[i] != 1) {
 			showErrorMessage("You entered not valid values!");
@@ -313,7 +308,6 @@ function setCustomPuzzle(path) {
 		val = path[c];
 		i = c / size >> 0;
 		j = c % size;
-		console.log("I = ", i, " | j = ", j);
 		if (val == 0) {
 			field.append("<div class='empty' id='tile-" + i + "-" + j + "'></div>");
 		} else {
@@ -346,19 +340,62 @@ function print(str) {
 	console.log(str);
 }
 
-$('#file_load').change(function() {
-	var fileName = $('#file_load')[0].files[0].name;
-	console.log("FILE = ", fileName);
-	file = new File([fileName], fileName);
+function readSingleFile() {
+	//Retrieve the first (and only!) File from the FileList object
+	var f = $('#file_load')[0].files[0];
+	if (window.File && window.FileReader && window.FileList && window.Blob) {
+		if (f) {
+			var r = new FileReader();
+			r.onload = function(e) { 
+			var contents = e.target.result;
+			// alert( "Got the file\n" 
+			// 	+"name: " + f.name + "\n"
+			// 	+"type: " + f.type + "\n"
+			// 	+"size: " + f.size + " bytes\n"
+			// 	+ "starts with: " + contents.substr(1, contents.indexOf("n"))
+			// );
+			ret = request('parse_file', {file: contents});
+			if (ret['error']) {
+				showErrorMessage("Bad file!");
+				$('#size').val(3);
+				$('#size').change();
+			} else if (validatePath(ret['field'])) {
+				$('#size').val(ret['size']);
+				setCustomPuzzle(ret['field']);
+			} else {
+				$('#size').val(3);
+				$('#size').change();
+			}
 
-	file.open("r"); // open file with read access
-	var str = "";
-	while (!file.eof) {
-		// read each line of text
-		str += file.readln() + "\n";
+		}
+		r.readAsBinaryString(f);
+		} else { 
+			alert("Failed to load file");
+		}
+	} else {
+		alert("Sorry your browser doesn't support file loading.")
 	}
-	file.close();
-	alert(str);
+}
+
+function validateSolve(size, algo, heuristics) {
+	if (size != 3 && size != 4) {
+		showErrorMessage("Bad size");
+		return false;
+	}
+	one = 0;
+	for (var i = 0; i < heuristics.length; i++) {
+		one += heuristics[i];
+	}
+	if (one == 0) {
+		showErrorMessage("Choose at least one heuristic!");
+		return false;
+	}
+	return true;
+}
+
+$('#file_load').change(function() {
+	readSingleFile();
+	// print(str);
 });
 
 $('#play').click(play_solution);
@@ -395,6 +432,9 @@ $('#solve').click(function () {
 	var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
 
 	freeInfo();
+	if (!validateSolve(size, algorithmType, [manhattan, linear, patternDatabase])) {
+		return;
+	}
 	var field = "";
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
@@ -409,7 +449,7 @@ $('#solve').click(function () {
 			}
 		}
 	}
-	if (!validatePath(field.split(''))) {
+	if (!validatePath(field.split(','))) {
 		return;
 	}
 	data = {size: size, field: field, manhattan: manhattan, linear: linear, patternDatabase: patternDatabase};
