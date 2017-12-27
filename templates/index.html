@@ -23,6 +23,8 @@
 			<button class="btn btn-primary actionButtons" id="play">Play the result!</button>
 		</div>
 	</div>
+	<div class="col-sm-12 col-md-6 alert alert-danger alert-dismissable fade in" id="error" style="display: none;">
+	</div>
 	<div class="col-sm-12 col-md-4">
 		<div class="info choice col-sm-12">
 			<form action="#">
@@ -93,6 +95,9 @@ function setPuzzle(custom) {
 	var size = Number($('#size').val());
 	var field = $('#puzzle');
 
+	if (!custom) {
+		custom = ($("#custom").html() == "Send") ? true : false;
+	}
 	field.html('');
 	// field.css('height', 195);
 	field.css('width', size * 61 + 18);
@@ -103,7 +108,7 @@ function setPuzzle(custom) {
 				break;
 			}
 			if (custom) {
-				$('#puzzleInput').append("<input type='Number' class='tile' id='input-" + i + "-" + j + "'>");
+				$('#puzzle').append("<input type='Number' class='tile' id='input-" + i + "-" + j + "'>");
 			} else {
 				$('#puzzle').append("<div class='tile' id='tile-" + i + "-" + j + "'>" + c + "</div>");
 			}
@@ -117,13 +122,17 @@ function setPuzzle(custom) {
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
 			if (custom) {
-
+				$('#input-' + i + '-' + j).css('top', field_static + i * tile_size);
+				$('#input-' + i + '-' + j).css('left', field_static + j * tile_size);
 			} else {
 				$('#tile-' + i + '-' + j).css('top', field_static + i * tile_size);
 				$('#tile-' + i + '-' + j).css('left', field_static + j * tile_size);
 			}
 			c++;
 		}
+	}
+	if (custom) {
+		$('#custom').html("Send");
 	}
 }
 
@@ -221,29 +230,86 @@ function delay_loop(i) {
     }, 500);
 }
 
-$('#play').click(play_solution);
+function checkSolvable(path, size, all_cells) {
+	var bem = 0;
+	for (var i = 0; i < all_cells; i++) {
+		if (path[i] == 0) {
+			continue;
+		}
+		for (var j = i + 1; j < all_cells; j++) {
+			if (path[j] == 0) {
+				continue;
+			}
+			if (path[i] > path[j]) {
+				bem++;
+			}
+		}
+	}
+	if ((size % 2 != 0 && bem % 2 == 0) ||
+		(size % 2 == 0 && bem % 2 != 0)) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
-$('#size').change(function () {
-	setPuzzle();
-});
+function validatePath(path) {
+	var size = Number($('#size').val());
+	var all_cells = Math.pow(size, 2);
+	valid = [];
+	for (var i = 0; i < all_cells; i++) {
+		valid[i] = 0;
+	}
+	console.log("VAL = ", valid);
+	for (var i = 0; i < all_cells; i++) {
+		valid[path[i]] = 1;
+	}
+	console.log("VALCH = ", valid);
+	for (var i = 0; i < all_cells; i++) {
+		if (valid[i] != 1) {
+			showErrorMessage("You entered not valid values!");
+			return false;
+		}
+	}
+	if (checkSolvable(path, size, all_cells)) {
+		return true;
+	} else {
+		showErrorMessage("Sorry, but this puzzle isn't solvable!");
+		return false;
+	}
+}
 
-$('#customInput').hide();
+function showErrorMessage(msg) {
+	$('#error').html(msg);
+	$('#error').show();
+}
 
-$('#custom').click(function() {
-	setPuzzle(true);
-});
+function readCustom() {
+	var size = Number($('#size').val());
+	var fie = [];
+	c = 0;
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			fie[c] = $('#input-' + i + '-' + j).val();
+			c++;
+		}
+	}
+	$("#custom").html("Custom input");
+	valid = validatePath(fie);
+	if (valid == true) {
+		setCustomPuzzle(fie);
+	} else {
+		showErrorMessage(valid);
+	}
+}
 
-$('#random').click(function () {
+function setCustomPuzzle(path) {
 	var size = Number($('#size').val());
 	var field = $('#puzzle');
 
-	console.log('new');
-	path = request('rand', {size: $('#size').val()});
-	console.log('PATH = ', path);
 	field.html('');
 	field.css('width', size * 61 + 18);
 	var c = 0;
-	console.log("PATH = ", path);
 	for (var c = 0; c < path.length; c++) {
 		val = path[c];
 		i = c / size >> 0;
@@ -263,12 +329,32 @@ $('#random').click(function () {
 			if (!val) {
 				val = Math.pow(size, 2);
 			}
-			console.log("HERE EPT", path[c]);
 			$(tile).css('left', field_static + j * tile_size);
 			$(tile).css('top', field_static + i * tile_size);
 			c++;
 		}
 	}
+}
+
+$('#play').click(play_solution);
+
+$('#size').change(function () {
+	setPuzzle();
+});
+
+$('#customInput').hide();
+
+$('#custom').click(function() {
+	if ($(this).html() == "Send") {
+		readCustom();
+	} else {
+		setPuzzle(true);
+	}
+});
+
+$('#random').click(function () {
+	path = request('rand', {size: $('#size').val()});
+	setCustomPuzzle(path);
 	// $('#puzzle').css('height', $('#puzzle').css('width'));
 });
 
