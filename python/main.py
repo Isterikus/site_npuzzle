@@ -41,10 +41,10 @@ def parse_solve(node):
 		node = node.parent
 	return solution[::-1]
 
-def from_site(size, path):
+def from_site(size, path, algo, heuristics):
 	# path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
 	print(size)
-	f = Algorithms("idaStar", size, "manhattan+linear2")
+	f = Algorithms(algo, size, heuristics)
 	rez = f.solve(path)
 	solution = parse_solve(rez['solution'])
 	to_c = ""

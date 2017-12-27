@@ -17,7 +17,7 @@
 		<div id="puzzle" class="puzzleTable">
 		</div>
 		<div id="actionsBar">
-			<label class="btn btn-info actionButtons" for="file_load">
+			<label class="btn btn-info actionButtons" for="file_load" id="labelFileLoad">
 				<input id="file_load" type="file" style="display:none;">
 				Load file
 			</label>
@@ -58,7 +58,24 @@
 					</div>
 					<div class="form-check">
 						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="linear2" value="linear2"> Linear conflict mine
+						</label>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
 							<input class="form-check-input" type="checkbox" id="patternDatabase" value="patternDatabase"> Pattern database
+						</label>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="tilesOut" value="tilesOut">
+							Tiles out of row/column
+						</label>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="euqlidian" value="euqlidian">
+							Euqlidian distance
 						</label>
 					</div>
 				</div>
@@ -87,12 +104,14 @@
 	<script type="text/javascript">
 var minSize = 3;
 var maxSize = 6;
-var algoTypes = [{'val': 'adaStar', 'text': 'ADA*'}, {'val': 'ada', 'text': 'A*'}];
+var algoTypes = [{'val': 'idaStar', 'text': 'ADA*'}, {'val': 'A', 'text': 'A*'}];
 var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
 var solution = "";
 var tile_size = 61;
 var field_static = 5;
 var FL = "";
+
+$('#manhattan').prop('checked', true);
 
 function setPuzzle(custom) {
 	var size = Number($('#size').val());
@@ -193,13 +212,37 @@ function animate_tile(move) {
 	return {'tile': tile_animate, 'zero': zero_animate};
 }
 
-function play_solution() {
-	if (solution != "") {
-		delay_loop(0);
+function readField() {
+	var size = Number($('#size').val());
+	var fie = [];
+
+	for (var i = 0; i < size; i++) {
+		for (var j = 0; j < size; j++) {
+			val = $('#tile-' + i + '-' + j).html();
+			if (!val) {
+				fie[i * size + j] = 0;
+			} else {
+				fie[i * size + j] = Number(val);
+			}
+		}
 	}
+	return fie;
 }
 
-function delay_loop(i) {
+function play_solution() {
+	before = readField();
+
+	if (solution != "") {
+		$.each($('.actionButtons'), function( index, value ) {
+			// alert( index + ": " + value );
+			$(value).prop('disabled', 'disabled');
+		});
+		// $('#play').prop('disabled', true);
+		delay_loop(0, before);
+	}
+}
+console.log($('.actionButtons'));
+function delay_loop(i, before) {
     // start a delay
     setTimeout(function(){
 		move = solution.charAt(i);
@@ -222,11 +265,22 @@ function delay_loop(i) {
 		tile_move = tile_move.substr(1);
 		document.getElementsByClassName("empty")[0].id = tile_move;
 
-        // recursive call
-        if (i < solution.length)
-            delay_loop(i + 1);
+		// recursive call
+		if (i < solution.length) {
+			delay_loop(i + 1, before);
+		}
+		else {
+			setTimeout(function() {
+				setCustomPuzzle(before);
+				$('#file_load').removeProp('disabled');
+				$.each($('.actionButtons'), function( index, value ) {
+					// alert( index + ": " + value );
+					$(value).prop('disabled', false);
+				});
+			}, 500);
+		}
 
-    }, 500);
+	}, 500);
 }
 
 function checkSolvable(path, size, all_cells) {
@@ -426,13 +480,17 @@ $('#random').click(function () {
 
 $('#solve').click(function () {
 	var size = Number($('#size').val());
-	var algorithmType = $('#algorithmType');
+	var algorithmType = $('#algorithmType').val();
 	var manhattan = ($('#manhattan').prop('checked')) ? 1 : 0;
 	var linear = ($('#linear').prop('checked')) ? 1 : 0;
+	var linear2 = ($('#linear2').prop('checked')) ? 1 : 0;
 	var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
+	var tilesOut = ($('#tilesOut').prop('checked')) ? 1 : 0;
+	var euqlidian = ($('#euqlidian').prop('checked')) ? 1 : 0;
 
+	var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian];
 	freeInfo();
-	if (!validateSolve(size, algorithmType, [manhattan, linear, patternDatabase])) {
+	if (!validateSolve(size, algorithmType, heuristics)) {
 		return;
 	}
 	var field = "";
@@ -452,7 +510,26 @@ $('#solve').click(function () {
 	if (!validatePath(field.split(','))) {
 		return;
 	}
-	data = {size: size, field: field, manhattan: manhattan, linear: linear, patternDatabase: patternDatabase};
+	heur = "";
+	for (var i = 0; i < heuristics.length; i++) {
+		if (heuristics[i] == 1) {
+			if (i == 0) {
+				heur += "manhattan+";
+			} else if (i == 1) {
+				heur += "linear+";
+			} else if (i == 2) {
+				heur += "linear2+";
+			} else if (i == 3) {
+				heur += "patternDatabase+";
+			} else if (i == 4) {
+				heur += "tilesOut+";
+			} else if (i == 5) {
+				heur += "euqlidian+";
+			}
+		}
+	}
+	heur = heur.slice(0, -1);
+	data = {size: size, field: field, algo: algorithmType, heuristics: heur};
 	ret = request('solve', data);
 	$("#timePython").html(ret['python_time']);
 	$("#timeC").html(ret['c_time']);
