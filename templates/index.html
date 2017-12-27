@@ -17,13 +17,15 @@
 		<div id="puzzle" class="puzzleTable">
 		</div>
 		<div id="actionsBar">
-			<button class="btn btn-primary actionButtons" id="custom">Custom input</button>
+			<label class="btn btn-info actionButtons" for="file_load">
+				<input id="file_load" type="file" style="display:none;">
+				Load file
+			</label>
+			<button class="btn btn-warning actionButtons" id="custom">Custom input</button>
 			<button class="btn btn-primary actionButtons" id="random">Make it random!</button>
 			<button class="btn btn-success actionButtons" id="solve">Solve!</button>
-			<button class="btn btn-primary actionButtons" id="play">Play the result!</button>
+			<button class="btn btn-danger actionButtons" id="play">Play the result!</button>
 		</div>
-	</div>
-	<div class="col-sm-12 col-md-6 alert alert-danger alert-dismissable fade in" id="error" style="display: none;">
 	</div>
 	<div class="col-sm-12 col-md-4">
 		<div class="info choice col-sm-12">
@@ -280,8 +282,7 @@ function validatePath(path) {
 }
 
 function showErrorMessage(msg) {
-	$('#error').html(msg);
-	$('#error').show();
+	alert(msg);
 }
 
 function readCustom() {
@@ -294,12 +295,10 @@ function readCustom() {
 			c++;
 		}
 	}
-	$("#custom").html("Custom input");
 	valid = validatePath(fie);
 	if (valid == true) {
+		$("#custom").html("Custom input");
 		setCustomPuzzle(fie);
-	} else {
-		showErrorMessage(valid);
 	}
 }
 
@@ -336,15 +335,43 @@ function setCustomPuzzle(path) {
 	}
 }
 
+function freeInfo() {
+	$("#timePython").html('');
+	$("#timeC").html('');
+	$('#moves').html('');
+	solution = "";
+}
+
+function print(str) {
+	console.log(str);
+}
+
+$('#file_load').change(function() {
+	var fileName = $('#file_load')[0].files[0].name;
+	console.log("FILE = ", fileName);
+	file = new File([fileName], fileName);
+
+	file.open("r"); // open file with read access
+	var str = "";
+	while (!file.eof) {
+		// read each line of text
+		str += file.readln() + "\n";
+	}
+	file.close();
+	alert(str);
+});
+
 $('#play').click(play_solution);
 
 $('#size').change(function () {
+	solution = "";
 	setPuzzle();
 });
 
 $('#customInput').hide();
 
 $('#custom').click(function() {
+	solution = "";
 	if ($(this).html() == "Send") {
 		readCustom();
 	} else {
@@ -353,6 +380,8 @@ $('#custom').click(function() {
 });
 
 $('#random').click(function () {
+	solution = "";
+	$('#custom').html("Custom input");
 	path = request('rand', {size: $('#size').val()});
 	setCustomPuzzle(path);
 	// $('#puzzle').css('height', $('#puzzle').css('width'));
@@ -365,6 +394,7 @@ $('#solve').click(function () {
 	var linear = ($('#linear').prop('checked')) ? 1 : 0;
 	var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
 
+	freeInfo();
 	var field = "";
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
@@ -379,7 +409,9 @@ $('#solve').click(function () {
 			}
 		}
 	}
-	console.log(field);
+	if (!validatePath(field.split(''))) {
+		return;
+	}
 	data = {size: size, field: field, manhattan: manhattan, linear: linear, patternDatabase: patternDatabase};
 	ret = request('solve', data);
 	$("#timePython").html(ret['python_time']);
