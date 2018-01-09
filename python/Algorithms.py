@@ -5,7 +5,7 @@ from .Node import *
 
 class Algorithms():
 	def __init__(self, algorithm, size, heuristics):
-		self.goal = [i+1 for i in range(pow(size, 2))]
+		self.goal = [i + 1 for i in range(pow(size, 2))]
 		self.goal[pow(size, 2) - 1] = 0
 		self.algorithm = algorithm
 		self.size = size
@@ -42,9 +42,15 @@ class Algorithms():
 				return False
 		return True
 
+	def hash(self, field):
+		h = ""
+		for el in field:
+			h += str(el)
+		return h
+
 	def aStar(self, startNode):
-		closed = []
-		opened = []
+		closed = set()
+		opened = list()
 		opened.append(startNode)
 		startNode.setH(self.heuristics.getH(startNode))
 		while opened:
@@ -52,9 +58,9 @@ class Algorithms():
 			opened.remove(curr)
 			if curr.field == self.goal:
 				return curr
-			closed.append(curr.field)
+			closed.add(self.hash(curr.field))
 			for child in curr.getChildrens():
-				if child.field not in closed:
+				if self.hash(child.field) not in closed:
 					child.setParent(curr)
 					child.setG(curr.getG() + 1)
 					child.setH(self.heuristics.getH(child) + child.getG())
@@ -63,16 +69,16 @@ class Algorithms():
 
 	def bfs(self, startNode):
 		opened = deque()  # FIFO queue
-		closed = []
+		closed = set()
 		opened.append(startNode)
 		while opened:
 			current = opened.popleft()
 
 			if current.field == self.goal:
 				return current
-
+			closed.add(self.hash(current.field))
 			for child in current.getChildrens():
-				if child.field not in closed:
+				if self.hash(child.field) not in closed:
 					child.setParent(current)
 					if self.not_in(opened, child):
 						opened.append(child)
