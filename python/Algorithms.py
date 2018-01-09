@@ -29,25 +29,20 @@ class Algorithms():
 	def idaStar(self, startNode):
 		bound = self.heuristics.getH(startNode)
 		solution = None
-		startTime = time()
 		while solution == None:
 			solution = self.depthFirstSearch(startNode, bound)
 			bound += 2
-			# print("B=  ", bound)
-		finish_time = time() - startTime
-		print("PYTHON_IDA* TIME = ", finish_time)
-		return {'time':finish_time,'solution':solution}
+		return solution
 
 	# IDA* END
 
-	def aStar(self, startNode):
-		def not_in(set, node):
-			for temp in set:
-				if node.field == temp.field:
-					return False
-			return True
+	def not_in(self, set, node):
+		for temp in set:
+			if node.field == temp.field:
+				return False
+		return True
 
-		startTime = time()
+	def aStar(self, startNode):
 		closed = []
 		opened = []
 		opened.append(startNode)
@@ -55,23 +50,44 @@ class Algorithms():
 		while opened:
 			curr = min(opened, key=lambda inst:inst.h)
 			opened.remove(curr)
-			# curr = opened.pop(0)
 			if curr.field == self.goal:
-				return {'time': (time() - startTime), 'solution': curr}
+				return curr
 			closed.append(curr.field)
 			for child in curr.getChildrens():
 				if child.field not in closed:
 					child.setParent(curr)
-					child.setH(self.heuristics.getH(child))
-					if not_in(opened, child):
+					child.setG(curr.getG() + 1)
+					child.setH(self.heuristics.getH(child) + child.getG())
+					if self.not_in(opened, child):
+						opened.append(child)
+
+	def bfs(self, startNode):
+		opened = deque()  # FIFO queue
+		closed = []
+		opened.append(startNode)
+		while opened:
+			current = opened.popleft()
+
+			if current.field == self.goal:
+				return current
+
+			for child in current.getChildrens():
+				if child.field not in closed:
+					child.setParent(current)
+					if self.not_in(opened, child):
 						opened.append(child)
 
 	def solve(self, startField):
+		sol = None
+		startTime = time()
 		startNode = Node(startField, self.size)
 		if self.algorithm == "idaStar":
-			return self.idaStar(startNode)
+			sol = self.idaStar(startNode)
 		elif self.algorithm == "aStar":
-			return self.aStar(startNode)
+			sol = self.aStar(startNode)
+		elif self.algorithm == "bfs":
+			sol = self.bfs(startNode)
+		return {'time': (time() - startTime), 'solution': sol}
 
 # test = Algorithms("aStar", 3, "manhattan+linear2")
 
@@ -82,3 +98,5 @@ class Algorithms():
 
 # test.solve(Node([2,7,6,3,5,4,0,1,8], 3))
 # test.solve(Node([[1,2,3],[4,5,6],[7,0,8]], 3))
+
+# Parallel Combinatorial Search  External-Memory Graph Search
