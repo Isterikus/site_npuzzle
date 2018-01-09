@@ -1,4 +1,4 @@
-# from json import load
+from json import load
 
 class Heuristics():
 	def __init__(self, heuristics, size):
@@ -8,14 +8,12 @@ class Heuristics():
 		self.real_positions = [{} for i in range(self.all_cells)]
 		self.realPositions()
 		# self.patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]]
-		# self.databases = []
-		# for i in range(2):
-		# 	if i == 0:
-		# 		file = "DATABASE_7_8-1"
-		# 	else:
-		# 		file = "DATABASE_7_8-2"
-		# 	with open("../databases/" + file, 'r') as f:
-		# 		self.databases.append(load(f))
+		self.patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]]
+		self.databases = []
+		for i in range(len(self.patterns)):
+			file = "DATABASE_4_4_4_3-" + str(i + 1)
+			with open("./databases/" + file, 'r') as f:
+				self.databases.append(load(f))
 
 	def realPositions(self):
 		for c in range(1, self.all_cells):
@@ -65,11 +63,11 @@ class Heuristics():
 
 	def patternDatabase(self, node):
 		ret = 0
-		for i in range(2):
-			if node.code(self.patterns[i]) in self.databases:
-				ret += self.databases[i][node.code(self.patterns[i])]
-			else:
-				return self.manhattan(node.field) + self.linear2(node.field)
+		for i in range(len(self.patterns)):
+			# if node.code(self.patterns[i]) in self.databases:
+			ret += self.databases[i][node.code(self.patterns[i])]
+			# else:
+			# 	return self.manhattan(node.field) + self.linear2(node.field)
 		return ret
 
 	def tilesOut(self, field):

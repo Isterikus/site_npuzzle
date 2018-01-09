@@ -12,6 +12,7 @@ directions = ['N','S','W','E']
 maxtraindep = 18
 patterns = [[1,2,3,4,5,6,7,8],[9,10,11,12,13,14,15]]
 
+
 class PatternDB:
 	def __init__(self, pattern):
 		self.pattern = pattern
@@ -25,6 +26,7 @@ class PatternDB:
 		code = state.mask(self.pattern)
 		if code not in self.cache:
 			self.cache[code] = steps
+
 
 class PatternState(Node):
 	def __init__(self, coding, blank, steps=0, parent=None, action=None, cost=0):
@@ -43,6 +45,7 @@ class PatternState(Node):
 			return child
 		else:
 			return None
+
 
 def train_pattern(goal, pattern):
 	db = PatternDB(pattern)
@@ -67,16 +70,19 @@ def train_pattern(goal, pattern):
 				visited.add((child.coding, child.blank))
 	return db
 
+
 def parse_state(statestr):
 	state = Node(0,(3,3))
 	for r,c in loops:
 		state.set(r,c,statestr[r][c])
 	return state
 
+
 pdbs = []
 def train(goal):
 	for pattern in patterns:
 		pdbs.append(train_pattern(goal, pattern))
+
 
 if __name__ == "__main__":
 	goal = parse_state([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]])

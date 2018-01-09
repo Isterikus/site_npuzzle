@@ -6,7 +6,9 @@ from Node import Node
 
 size = 4
 all_cells = pow(size, 2)
-patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]]
+# patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]] # 7-8
+# patterns = [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15]] # 6-6-3
+patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]] # 4-4-4-3
 pdbs = []
 
 
@@ -17,7 +19,7 @@ def check_not_in(node, arr):
 	return True
 
 
-max_train_dep = 18
+max_train_dep = 50
 
 
 class PatternDB:
@@ -66,7 +68,9 @@ def train_pattern(goal, pattern):
 		current = frontier.popleft()
 		db.add(current)
 
-		if current.getG() > max_train_dep: break
+		# if current.getG() > max_train_dep: break
+		if len(db.cache) >= 32760:
+			break
 
 		for child in current.getChildrens():
 			child.setParent(current)
@@ -105,11 +109,16 @@ if __name__ == '__main__':
 	t = clock()
 	train()
 	print("Training time: ", clock() - t, " cpu seconds")
-	for i in range(2):
-		if i == 0:
-			file = "DATABASE_7_8-1"
-		else:
-			file = "DATABASE_7_8-2"
+	# for i in range(2):
+	# 	if i == 0:
+	# 		file = "DATABASE_7_8-1"
+	# 	else:
+	# 		file = "DATABASE_7_8-2"
+	# 	with open("../databases/" + file, 'w') as out:
+	# 		print("CACHE LEN = ", len(pdbs[i].cache))
+	# 		dump(pdbs[i].cache, out)
+	for i in range(len(patterns)):
+		file = "DATABASE_4_4_4_3-" + str(i + 1)
 		with open("../databases/" + file, 'w') as out:
 			print("CACHE LEN = ", len(pdbs[i].cache))
 			dump(pdbs[i].cache, out)

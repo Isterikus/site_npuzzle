@@ -45,10 +45,19 @@ class Node:
 
 	def code(self, pattern):
 		code = ""
-		for val in pattern:
-			pos = self.find(val)
-			code += str(pos['i']) + str(pos['j'])
+		for val in self.field:
+			if val not in pattern:
+				code += "0"
+			elif val == 0:
+				code += "0"
+			else:
+				code += str(val)
 		return code
+		# code = ""
+		# for val in pattern:
+		# 	pos = self.find(val)
+		# 	code += str(pos['i']) + str(pos['j'])
+		# return code
 
 	def getChildrens(self):
 		pos = self.getZero()
