@@ -25,9 +25,7 @@ def rand():
 
 @app.route('/solve', methods=['POST'])
 def solve():
-	print(request.values)
 	initial_field = [int(i) for i in request.values['field'].split(',')]
-	print(initial_field)
 	rez = from_site(int(request.values['size']), initial_field, request.values['algo'], request.values['heuristics'])
 	# print("TIME = ", rez[''])
 	return json.dumps(rez)

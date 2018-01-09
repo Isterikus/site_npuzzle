@@ -56,11 +56,11 @@
 							<input class="form-check-input" type="checkbox" id="linear" value="linear"> Linear conflict
 						</label>
 					</div>
-					<div class="form-check">
+<!-- 					<div class="form-check">
 						<label class="form-check-label heuristic">
 							<input class="form-check-input" type="checkbox" id="linear2" value="linear2"> Linear conflict mine
 						</label>
-					</div>
+					</div> -->
 					<div class="form-check">
 						<label class="form-check-label heuristic">
 							<input class="form-check-input" type="checkbox" id="patternDatabase" value="patternDatabase"> Pattern database
@@ -104,7 +104,7 @@
 	<script type="text/javascript">
 var minSize = 3;
 var maxSize = 6;
-var algoTypes = [{'val': 'idaStar', 'text': 'ADA*'}, {'val': 'A', 'text': 'A*'}];
+var algoTypes = [{'val': 'idaStar', 'text': 'ADA*'}, {'val': 'aStar', 'text': 'A*'}];
 var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
 var solution = "";
 var tile_size = 61;
@@ -112,6 +112,7 @@ var field_static = 5;
 var FL = "";
 
 $('#manhattan').prop('checked', true);
+$('#linear').prop('checked', true);
 
 function setPuzzle(custom) {
 	var size = Number($('#size').val());

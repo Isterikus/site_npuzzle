@@ -8,6 +8,7 @@ class Node:
 		self.all_cells = pow(self.size, 2)
 		self.parent = None
 		self.g = 0
+		self.h = 0
 
 	def getZero(self):
 		for i in range(self.all_cells):
@@ -29,6 +30,12 @@ class Node:
 
 	def getG(self):
 		return self.g
+
+	def setH(self, h):
+		self.h = h
+
+	def getH(self):
+		return self.h
 
 	def find(self, val):
 		for i in range(self.size):

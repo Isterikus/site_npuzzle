@@ -1,4 +1,5 @@
 from time import time
+from collections import deque
 from .Heuristics import *
 from .Node import *
 
@@ -39,12 +40,40 @@ class Algorithms():
 
 	# IDA* END
 
+	def aStar(self, startNode):
+		def not_in(set, node):
+			for temp in set:
+				if node.field == temp.field:
+					return False
+			return True
+
+		startTime = time()
+		closed = []
+		opened = []
+		opened.append(startNode)
+		startNode.setH(self.heuristics.getH(startNode))
+		while opened:
+			curr = min(opened, key=lambda inst:inst.h)
+			opened.remove(curr)
+			# curr = opened.pop(0)
+			if curr.field == self.goal:
+				return {'time': (time() - startTime), 'solution': curr}
+			closed.append(curr.field)
+			for child in curr.getChildrens():
+				if child.field not in closed:
+					child.setParent(curr)
+					child.setH(self.heuristics.getH(child))
+					if not_in(opened, child):
+						opened.append(child)
+
 	def solve(self, startField):
 		startNode = Node(startField, self.size)
 		if self.algorithm == "idaStar":
 			return self.idaStar(startNode)
+		elif self.algorithm == "aStar":
+			return self.aStar(startNode)
 
-# test = Algorithms("idaStar", 3, "patternDatabase")
+# test = Algorithms("aStar", 3, "manhattan+linear2")
 
 # 3
 # 2 7 6
