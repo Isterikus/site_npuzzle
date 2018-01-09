@@ -72,12 +72,13 @@ class Heuristics():
 				return self.manhattan(node.field) + self.linear2(node.field)
 		return ret
 
-	def test(self, arr, val):
-		i = 0
-		while i < len(arr):
-			if arr[i] == val:
-				return i
-			i += 1
+	def tilesOut(self, field):
+		h = 0
+		for pos in range(self.all_cells):
+			if field[pos] != 0:
+				h += 1 if (pos // self.size - self.real_positions[field[pos]]['i']) else 0
+				h += 1 if (pos % self.size - self.real_positions[field[pos]]['j']) else 0
+		return h
 
 	def getH(self, node):
 		h = 0
@@ -90,6 +91,8 @@ class Heuristics():
 				h += self.linear2(node.field)
 			elif heuristic == "patternDatabase":
 				h += self.patternDatabase(node)
+			elif heuristic == "tilesOut":
+				h += self.tilesOut(node.field)
 		return h
 
 # field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
