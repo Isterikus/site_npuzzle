@@ -58,7 +58,7 @@
 					</div>
 					<div class="form-check">
 						<label class="form-check-label heuristic">
-							<input class="form-check-input" type="checkbox" id="linear2" value="linear2"> Linear conflict mine
+							<input class="form-check-input" type="checkbox" id="linear2" value="linear2"> Linear conflict mine (not admissible)
 						</label>
 					</div>
 					<div class="form-check">
@@ -70,6 +70,12 @@
 						<label class="form-check-label heuristic">
 							<input class="form-check-input" type="checkbox" id="tilesOut" value="tilesOut">
 							Tiles out of row/column
+						</label>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label heuristic">
+							<input class="form-check-input" type="checkbox" id="misplacedTiles" value="misplacedTiles">
+							Misplaced Tiles
 						</label>
 					</div>
 					<div class="form-check">
@@ -103,16 +109,16 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 var minSize = 3;
-var maxSize = 6;
+var maxSize = 4;
 var algoTypes = [{'val': 'idaStar', 'text': 'IDA*'}, {'val': 'aStar', 'text': 'A*'}, {'val': 'bfs', 'text': 'Breadth first search'}];
 var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
 var solution = "";
 var tile_size = 61;
 var field_static = 5;
-var FL = "";
 
 $('#manhattan').prop('checked', true);
 $('#linear').prop('checked', true);
+$('#patternDatabase').attr("disabled", true);
 
 function setPuzzle(custom) {
 	var size = Number($('#size').val());
@@ -410,18 +416,18 @@ function readSingleFile() {
 			// 	+ "starts with: " + contents.substr(1, contents.indexOf("n"))
 			// );
 			ret = request('parse_file', {file: contents});
+			console.log("RET = ", ret);
 			if (ret['error']) {
 				showErrorMessage("Bad file!");
 				$('#size').val(3);
 				$('#size').change();
-			} else if (validatePath(ret['field'])) {
-				$('#size').val(ret['size']);
-				setCustomPuzzle(ret['field']);
 			} else {
-				$('#size').val(3);
+				$('#size').val(ret['size']);
 				$('#size').change();
+				if (validatePath(ret['field'])) {
+					setCustomPuzzle(ret['field']);
+				}
 			}
-
 		}
 		r.readAsBinaryString(f);
 		} else { 
@@ -441,7 +447,7 @@ function validateSolve(size, algo, heuristics) {
 	for (var i = 0; i < heuristics.length; i++) {
 		one += heuristics[i];
 	}
-	if (one == 0) {
+	if (one == 0 && algo != "bfs") {
 		showErrorMessage("Choose at least one heuristic!");
 		return false;
 	}
@@ -457,6 +463,12 @@ $('#play').click(play_solution);
 
 $('#size').change(function () {
 	solution = "";
+	if ($(this).val() == 4) {
+		$('#patternDatabase').attr("disabled", false);
+	} else {
+		$('#patternDatabase').prop('checked', false);
+		$('#patternDatabase').attr("disabled", true);
+	}
 	setPuzzle();
 });
 
@@ -488,8 +500,9 @@ $('#solve').click(function () {
 	var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
 	var tilesOut = ($('#tilesOut').prop('checked')) ? 1 : 0;
 	var euqlidian = ($('#euqlidian').prop('checked')) ? 1 : 0;
+	var misplacedTiles = ($('#misplacedTiles').prop('checked')) ? 1 : 0;
 
-	var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian];
+	var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian, misplacedTiles];
 	freeInfo();
 	if (!validateSolve(size, algorithmType, heuristics)) {
 		return;
@@ -525,7 +538,9 @@ $('#solve').click(function () {
 			} else if (i == 4) {
 				heur += "tilesOut+";
 			} else if (i == 5) {
-				heur += "euqlidian+";
+				heur += "euclideanDistance+";
+			} else if (i == 6) {
+				heur += "misplacedTiles+";
 			}
 		}
 	}

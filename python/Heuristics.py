@@ -1,4 +1,5 @@
 from json import load
+from math import sqrt
 
 class Heuristics():
 	def __init__(self, heuristics, size):
@@ -79,6 +80,25 @@ class Heuristics():
 				h += 1 if (pos % self.size - self.real_positions[field[pos]]['j']) else 0
 		return h
 
+	def misplacedTiles(self, field):
+		h = 0
+		i = 0
+		for val in field:
+			if val == 0 and i != len(field) - 1:
+				h += 1
+			elif i // self.size != (val - 1) // self.size or i % self.size != (val - 1) % self.size:
+				h += 1
+			i += 1
+		return h
+
+	def euclideanDistance(self, field):
+		h = 0.0
+		for pos in range(self.all_cells):
+			if field[pos] != 0:
+				h += sqrt(pow(pos // self.size - self.real_positions[field[pos]]['i'], 2)
+					+ pow(pos % self.size - self.real_positions[field[pos]]['j'], 2))
+		return h
+
 	def getH(self, node):
 		h = 0
 		for heuristic in self.heuristics.split('+'):
@@ -92,6 +112,10 @@ class Heuristics():
 				h += self.patternDatabase(node)
 			elif heuristic == "tilesOut":
 				h += self.tilesOut(node.field)
+			elif heuristic == "misplacedTiles":
+				h += self.misplacedTiles(node.field)
+			elif heuristic == "euclideanDistance":
+				h += self.euclideanDistance(node.field)
 		return h
 
 # field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]

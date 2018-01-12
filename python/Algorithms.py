@@ -30,6 +30,7 @@ class Algorithms():
 
 	def idaStar(self, startNode):
 		bound = self.heuristics.getH(startNode)
+		print("BOUND = ", bound)
 		solution = None
 		while solution == None:
 			solution = self.depthFirstSearch(startNode, bound)

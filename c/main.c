@@ -299,7 +299,7 @@ void	solve(int *initial_field)
 	free(initial);
 }
 
-void     python(int sz, char *field)
+void     python(int sz, char *field, char *algo, char *heuristics)
 {
     int		*initial_field;
 	int		i;

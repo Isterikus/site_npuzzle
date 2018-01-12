@@ -1,14 +1,29 @@
 # from subprocess import call
 from time import time
 from ctypes import *
+from random import randint
 
 from .Algorithms import *
 from .generator import *
+from .Node import *
+
+
+def doRand(size):
+	bem = [i + 1 for i in range(pow(size, 2))]
+	bem[pow(size, 2) - 1] = 0
+	goal = Node(bem, size)
+	for _ in range(500):
+		child = goal.getChildrens()
+		i = randint(0, len(child) - 1)
+		goal = child[i]
+	return goal.field
+
 
 def getRandomPath(size):
 	path = []
 	while True:
-		path = make_puzzle(size, False, 10000)
+		# path = make_puzzle(size, False, 10000)
+		path = doRand(size)
 		bem = 0
 		for i in range(pow(size, 2)):
 			if path[i] == 0:
@@ -56,8 +71,10 @@ def from_site(size, path, algo, heuristics):
 	print("to c = ", to_c)
 	c_module = CDLL('./adder.so')
 	to_c = c_char_p(to_c.encode('utf-8'))
+	algo_c = c_char_p(algo.encode('utf-8'))
+	heuristics_c = c_char_p(heuristics.encode('utf-8'))
 	start_c = time()
-	c_module.python(size, to_c)
+	c_module.python(size, to_c, algo_c, heuristics_c)
 	c_time = time() - start_c
 	print("C TIME = ", c_time)
 	# call(["./a.out", str(size), to_c])
