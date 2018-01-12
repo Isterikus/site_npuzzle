@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <limits.h>
+#include <string.h>
 #include "libft/printf_functions/includes/header.h"
 
 typedef struct		s_state
@@ -25,6 +26,7 @@ int		abs(int x);
 int		getH(int *field);
 int		getManhattan(int *field);
 int		getLinearConflict(int *field);
+int		getLinearConflictMine(int *field);
 int		getPatternDatabaseMine(int *field);
 int		getPatternDatabase(int *field);
 int		compare_array(int *field1, int *field2);

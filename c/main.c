@@ -7,6 +7,7 @@ int		*bottom_range;
 int		*database;
 int		n;
 int		size;
+char	*heuristics;
 
 void	set_range()
 {
@@ -37,7 +38,24 @@ int		abs(int x)
 
 int		getH(int *field)
 {
-	return getManhattan(field);// + getLinearConflictMine(field);
+	char	*heu;
+	char	*temp;
+	int		h;
+
+	temp = strdup(heuristics);
+	heu = strtok(temp, "+");
+	h = 0;
+	while (heu != NULL) {
+		if (strcmp(heu, "manhattan") == 0) {
+			h += getManhattan(field);
+		} else if (strcmp(heu, "linear") == 0) {
+			h += getLinearConflict(field);
+		} else if (strcmp(heu, "linear2") == 0) {
+			h += getLinearConflictMine(field);
+		}
+		heu = strtok(NULL, "+");
+	}
+	return h;
 }
 
 int		getManhattan(int *field)
@@ -57,17 +75,56 @@ int		getManhattan(int *field)
 		while (j < n)
 		{
 			pos = i * n + j;
-			if (field[pos] == 0) {
-				pl_i = n - 1;
-				pl_j = n - 1;
-			} else if (field[pos] % n == 0) {
-				pl_i = field[pos] / n - 1;
-				pl_j = n - 1;
-			} else {
-				pl_i = field[pos] / n;
-				pl_j = field[pos] % n - 1;
+			if (field[pos] != 0) {
+				if (field[pos] % n == 0) {
+					pl_i = field[pos] / n - 1;
+					pl_j = n - 1;
+				} else {
+					pl_i = field[pos] / n;
+					pl_j = field[pos] % n - 1;
+				}
+				ret += abs(i - pl_i) + abs(j - pl_j);
 			}
-			ret += abs(i - pl_i) + abs(j - pl_j);
+			j++;
+		}
+		i++;
+	}
+	return ret;
+}
+
+int		getLinearConflict(int *field)
+{
+	int		ret;
+	int		i;
+	int		j;
+	int		max_i;
+	int		max_j;
+	int		val_i;
+	int		val_j;
+
+	ret = 0;
+	i = 0;
+	while (i < n) {
+		j = 0;
+		max_i = -1;
+		max_j = -1;
+		while (j < n) {
+			val_i = field[i * n + j];
+			val_j = field[j * n + i];
+			if (val_i != 0 && (val_i - 1) / n == i) {
+				if (val_i > max_i) {
+					max_i = val_i;
+				} else {
+					ret += 2;
+				}
+			}
+			if (val_j != 0 && val_j % n == i + 1) {
+				if (val_j > max_j) {
+					max_j = val_j;
+				} else {
+					ret += 2;
+				}
+			}
 			j++;
 		}
 		i++;
@@ -136,30 +193,37 @@ int		ansver(int *field)
 	return 1;
 }
 
-void	print_way(t_state *node)
+void	print_field(t_state *node)
 {
 	int		i;
 	int		j;
+
+	i = 0;
+	printf("H = %d\n", node->h);
+	while (i < n)
+	{
+		j = 0;
+		while (j < n)
+		{
+			printf("%d ", node->field[i * n + j]);
+			j++;
+		}
+		i++;
+		printf("\n");
+	}
+	printf("----------------------------------\n");
+}
+
+void	print_way(t_state *node)
+{
 	int		len = 0;
 
-	while (node != NULL)
-	{
-		i = 0;
-		while (i < n)
-		{
-			j = 0;
-			while (j < n)
-			{
-				printf("%d ", (*node).field[i * n + j]);
-				j++;
-			}
-			i++;
-			printf("\n");
-		}
-		printf("----------------------------------\n");
-		node = node->parent;
-		len++;
-	}
+	// while (node != NULL)
+	// {
+	// 	print_field(node);
+	// 	node = node->parent;
+	// 	len++;
+	// }
 	printf("LEN = %d\n", len);
 }
 
@@ -252,7 +316,7 @@ int		search(t_state *node, int g, int bound)
 	if (f > bound)
 		return 0;
 	if (ansver(node->field)) {
-		// print_way(node);
+		print_way(node);
 		return 1;
 	}
 	i = 1;
@@ -374,10 +438,27 @@ void	append(t_sts **list, t_state *app)
 {
 	t_sts	*new;
 
-	new = (t_sts *)malloc(sizeof(t_sts));
-	new->state = app;
-	new->next = (*list);
-	(*list) = new;
+	if ((*list) == NULL) {
+		(*list) = (t_sts *)malloc(sizeof(t_sts));
+		(*list)->state = app;
+		(*list)->next = NULL;
+	} else {
+		new = *list;
+		while(new->next != NULL) {
+			new = new->next;
+		}
+		new->next = (t_sts *)malloc(sizeof(t_sts));
+		new->next->state = app;
+		new->next->next = NULL;
+	}
+}
+
+void	debag(t_sts	*bem)
+{
+	while(bem != NULL) {
+		print_field(bem->state);
+		bem = bem->next;
+	}
 }
 
 void	aStar(int *initial_field)
@@ -400,6 +481,7 @@ void	aStar(int *initial_field)
 	closed->state = NULL;
 	opened->next = NULL;
 	closed->next = NULL;
+	print_field(initial);
 	while(opened) {
 		current = min(&opened);
 		if (ansver(current->field)) {
@@ -423,7 +505,8 @@ void	aStar(int *initial_field)
 			}
 			if (not_in(closed, succ)) {
 				succ->parent = current;
-				succ->h = current->g + 1 + getH(succ->field);
+				succ->g = current->g + 1;
+				succ->h = succ->g + getH(succ->field);
 				if (not_in(opened, succ)) {
 					append(&opened, succ);
 				}
@@ -434,17 +517,8 @@ void	aStar(int *initial_field)
 	free(initial);
 }
 
-void	python(int sz, char *field, char *algo, char *heuristics)
+void	python(int sz, char *field, char *algo, char *heurs)
 {
-	heuristics = NULL;
-
-
-
-
-
-
-
-
 	int		*initial_field;
 	int		i;
 	int		j;
@@ -464,9 +538,10 @@ void	python(int sz, char *field, char *algo, char *heuristics)
 		j++;
 	}
 	set_range();
-	if (ft_strcmp("idaStar", algo)) {
+	heuristics = heurs;
+	if (strcmp("idaStar", algo) == 0) {
 		idaStar(initial_field);
-	} else if (ft_strcmp("aStar", algo)) {
+	} else if (strcmp("aStar", algo) == 0) {
 		aStar(initial_field);
 	}
 	free(left_range);

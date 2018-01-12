@@ -2,6 +2,7 @@ import os
 from flask import Flask, jsonify, request, url_for, render_template
 from flask_cors import CORS
 import json
+from os import system
 
 # from python.generator import *
 from python.main import *
@@ -63,4 +64,5 @@ def parse_file():
 	return json.dumps({'size': n, 'field': initial_field})
 
 if __name__ == '__main__':
+	system("make toPython -C c/")
 	app.run(debug=True)
