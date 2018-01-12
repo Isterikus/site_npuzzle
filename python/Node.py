@@ -2,18 +2,20 @@ from copy import copy
 
 
 class Node:
-	def __init__(self, field, size):
+	def __init__(self, field, size, action='0'):
 		self.field = field
 		self.size = size
-		self.all_cells = pow(self.size, 2)
+		# self.all_cells = pow(self.size, 2)
 		self.parent = None
-		self.g = 0
 		self.h = 0
+		self.action = action
 
 	def getZero(self):
-		for i in range(self.all_cells):
-			if self.field[i] == 0:
+		i = 0
+		for val in self.field:
+			if val == 0:
 				return i
+			i += 1
 
 	def getField(self):
 		return self.field
@@ -24,12 +26,6 @@ class Node:
 
 	def getParent(self):
 		return self.parent
-
-	def setG(self, g):
-		self.g = g
-
-	def getG(self):
-		return self.g
 
 	def setH(self, h):
 		self.h = h
@@ -62,25 +58,20 @@ class Node:
 	def getChildrens(self):
 		pos = self.getZero()
 		childrens = []
-		if pos >= self.size:
+		if self.action != 'b' and pos >= self.size:
 			tmp_field = copy(self.field)
 			tmp_field[pos], tmp_field[pos-self.size] = tmp_field[pos-self.size], 0
-			childrens.append(Node(tmp_field, self.size))
-		if pos < self.all_cells - self.size:
+			childrens.append(Node(tmp_field, self.size, 't'))
+		if self.action != 't' and pos < len(self.field) - self.size:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos+self.size] = tmp_field[pos+self.size],0
-			childrens.append(Node(tmp_field, self.size))
-		if pos % self.size != 0:
+			childrens.append(Node(tmp_field, self.size, 'b'))
+		if self.action != 'r' and pos % self.size != 0:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos-1] = tmp_field[pos-1],0
-			childrens.append(Node(tmp_field, self.size))
-		if (pos + 1) % self.size != 0:
+			childrens.append(Node(tmp_field, self.size, 'l'))
+		if self.action != 'l' and (pos + 1) % self.size != 0:
 			tmp_field = copy(self.field)
 			tmp_field[pos],tmp_field[pos+1] = tmp_field[pos+1],0
-			childrens.append(Node(tmp_field, self.size))
-		i = 0
-		while i < len(childrens):
-			if self.getParent() is not None and self.getParent().field == childrens[i].field:
-				del childrens[i]
-			i += 1
+			childrens.append(Node(tmp_field, self.size, 'r'))
 		return childrens

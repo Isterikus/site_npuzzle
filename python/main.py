@@ -42,7 +42,8 @@ def parse_solve(node):
 	return solution[::-1]
 
 def from_site(size, path, algo, heuristics):
-	# path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12]
+	# path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12] - 48
+	# path = [0, 6, 14, 3, 9, 5, 13, 7, 12, 2, 1, 8, 11, 10, 15, 4] - 46
 	print(size)
 	f = Algorithms(algo, size, heuristics)
 	rez = f.solve(path)

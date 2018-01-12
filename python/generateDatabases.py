@@ -72,6 +72,8 @@ def train_pattern(goal, pattern):
 		# if current.getG() > max_train_dep: break
 		# if len(db.cache) >= 32760:
 		# 	break
+		if len(db.cache) % 100000 == 0:
+			print("ONE THOUSAND")
 
 		for child in current.getChildrens():
 			child.setParent(current)

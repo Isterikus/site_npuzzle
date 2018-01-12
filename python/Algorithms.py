@@ -11,18 +11,19 @@ class Algorithms():
 		self.algorithm = algorithm
 		self.size = size
 		self.heuristics = Heuristics(heuristics, size)
-	
+		# self.heu_time = 0
 	# IDA* START
 
-	def depthFirstSearch(self, current, bound):
+	def depthFirstSearch(self, current, bound, g=0):
 		if current.field == self.goal:
 			return current
 		for children in current.getChildrens():
 			children.setParent(current)
-			children.setG(current.getG() + 1)
+			# h1 = time()
 			h = self.heuristics.getH(children)
-			if children.getG() + h <= bound:
-				rez = self.depthFirstSearch(children, bound)
+			# self.heu_time += (time() - h1)
+			if g + h <= bound:
+				rez = self.depthFirstSearch(children, bound, g + 1)
 				if rez != None:
 					return rez
 		return None
@@ -88,6 +89,7 @@ class Algorithms():
 			sol = self.aStar(startNode)
 		elif self.algorithm == "bfs":
 			sol = self.bfs(startNode)
+		# print("HEU Time = ", self.heu_time)
 		return {'time': (time() - startTime), 'solution': sol}
 
 # test = Algorithms("aStar", 3, "manhattan+linear2")
