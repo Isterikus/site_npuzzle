@@ -37,7 +37,7 @@ int		abs(int x)
 
 int		getH(int *field)
 {
-	return getManhattan(field) + getLinearConflict(field);
+	return getManhattan(field);// + getLinearConflictMine(field);
 }
 
 int		getManhattan(int *field)
@@ -75,7 +75,7 @@ int		getManhattan(int *field)
 	return ret;
 }
 
-int		getLinearConflict(int *field)
+int		getLinearConflictMine(int *field)
 {
 	int		ret;
 	int		i;
@@ -140,6 +140,7 @@ void	print_way(t_state *node)
 {
 	int		i;
 	int		j;
+	int		len = 0;
 
 	while (node != NULL)
 	{
@@ -157,7 +158,9 @@ void	print_way(t_state *node)
 		}
 		printf("----------------------------------\n");
 		node = node->parent;
+		len++;
 	}
+	printf("LEN = %d\n", len);
 }
 
 int		elemInArray(int elem, int arr_num)
@@ -278,16 +281,16 @@ int		search(t_state *node, int g, int bound)
 	return 0;
 }
 
-void	solve(int *initial_field)
+void	idaStar(int *initial_field)
 {
 	t_state	*initial;
 	int		bound;
 	int		t;
+
 	initial = (t_state *)malloc(sizeof(t_state));
 	initial->g = 0;
 	initial->field = initial_field;
 	initial->parent = NULL;
-	set_range();
 	bound = getH(initial->field);
 	while (1)
 	{
@@ -299,9 +302,150 @@ void	solve(int *initial_field)
 	free(initial);
 }
 
-void     python(int sz, char *field, char *algo, char *heuristics)
+t_state	*pop(t_sts **start)
 {
-    int		*initial_field;
+	t_state	*ret;
+
+	ret = (*start)->state;
+	(*start) = (*start)->next;
+	return ret;
+}
+
+t_state	*min(t_sts	**start)
+{
+	t_sts	*prev;
+	t_sts	*temp;
+	t_sts	*go;
+	t_sts	*prev_go;
+	t_state	*ret;
+	int		min;
+
+	prev = NULL;
+	prev_go = NULL;
+	go = *start;
+	temp = *start;
+	min = temp->state->h;
+	while (temp) {
+		if (temp->state->h < min) {
+			min = temp->state->h;
+			prev_go = prev;
+			go = temp;
+		}
+		prev = temp;
+		temp = temp->next;
+	}
+	ret = go->state;
+	if (prev_go == NULL) {
+		free(*start);
+		*start = go->next;
+	} else {
+		prev_go->next = go->next;
+		free(go);
+	}
+	return ret;
+}
+
+void	add_node(t_sts *list, t_state *state)
+{
+	if (list->state != NULL) {
+		while (list->next != NULL) {
+			list = list->next;
+		}
+		list->next = (t_sts *)malloc(sizeof(t_sts));
+		list->next->state = state;
+		list->next->next = NULL;
+	} else {
+		list->state = state;
+	}
+}
+
+int		not_in(t_sts *list, t_state *check)
+{
+	while (list != NULL) {
+		if (compare_array(list->state->field, check->field)) {
+			return 0;
+		}
+		list = list->next;
+	}
+	return 1;
+}
+
+void	append(t_sts **list, t_state *app)
+{
+	t_sts	*new;
+
+	new = (t_sts *)malloc(sizeof(t_sts));
+	new->state = app;
+	new->next = (*list);
+	(*list) = new;
+}
+
+void	aStar(int *initial_field)
+{
+	t_state	*initial;
+	t_state	*current;
+	t_sts	*closed;
+	t_sts	*opened;
+	t_state	*succ;
+	int		i;
+
+	initial = (t_state *)malloc(sizeof(t_state));
+	initial->g = 0;
+	initial->field = initial_field;
+	initial->parent = NULL;
+	initial->h = getH(initial->field);
+	opened = (t_sts *)malloc(sizeof(t_sts));
+	closed = (t_sts *)malloc(sizeof(t_sts));
+	opened->state = initial;
+	closed->state = NULL;
+	opened->next = NULL;
+	closed->next = NULL;
+	while(opened) {
+		current = min(&opened);
+		if (ansver(current->field)) {
+			print_way(current);
+			free(initial);
+			return;
+		}
+		add_node(closed, current);
+		i = 1;
+		while (i < 5) {
+			succ = find_neighbor(i, current->field);
+			if (succ == NULL) {
+				i++;
+				continue;
+			}
+			if (current->parent && compare_array(current->parent->field, succ->field)) {
+				free(succ->field);
+				free(succ);
+				i++;
+				continue;
+			}
+			if (not_in(closed, succ)) {
+				succ->parent = current;
+				succ->h = current->g + 1 + getH(succ->field);
+				if (not_in(opened, succ)) {
+					append(&opened, succ);
+				}
+			}
+			i++;
+		}
+	}
+	free(initial);
+}
+
+void	python(int sz, char *field, char *algo, char *heuristics)
+{
+	heuristics = NULL;
+
+
+
+
+
+
+
+
+	int		*initial_field;
 	int		i;
 	int		j;
 
@@ -319,7 +463,12 @@ void     python(int sz, char *field, char *algo, char *heuristics)
 			i++;
 		j++;
 	}
-	solve(initial_field);
+	set_range();
+	if (ft_strcmp("idaStar", algo)) {
+		idaStar(initial_field);
+	} else if (ft_strcmp("aStar", algo)) {
+		aStar(initial_field);
+	}
 	free(left_range);
 	free(right_range);
 	free(top_range);
@@ -349,7 +498,8 @@ int		main(int argc, char const *argv[])
 			i++;
 		j++;
 	}
-	solve(initial_field);
+	set_range();
+	aStar(initial_field);
 	free(left_range);
 	free(right_range);
 	free(top_range);

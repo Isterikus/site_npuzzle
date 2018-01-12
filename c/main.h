@@ -3,6 +3,7 @@
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <limits.h>
 #include "libft/printf_functions/includes/header.h"
 
 typedef struct		s_state
@@ -12,6 +13,12 @@ typedef struct		s_state
 	int				g;
 	struct s_state	*parent;
 }					t_state;
+
+typedef struct		s_sts
+{
+	t_state			*state;
+	struct s_sts	*next;
+}					t_sts;
 
 void	set_range();
 int		abs(int x);
