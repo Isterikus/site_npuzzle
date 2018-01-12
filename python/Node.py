@@ -8,6 +8,7 @@ class Node:
 		# self.all_cells = pow(self.size, 2)
 		self.parent = None
 		self.h = 0
+		self.g = 0
 		self.action = action
 
 	def getZero(self):
@@ -26,6 +27,12 @@ class Node:
 
 	def getParent(self):
 		return self.parent
+
+	def getG(self):
+		return self.g
+
+	def setG(self, g):
+		self.g = g
 
 	def setH(self, h):
 		self.h = h

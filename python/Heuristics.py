@@ -8,11 +8,11 @@ class Heuristics():
 		self.real_positions = [{} for i in range(self.all_cells)]
 		self.realPositions()
 		# self.patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]]
-		self.patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]]
-		# self.patterns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]]  # 5-5-5
+		# self.patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]]
+		self.patterns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]]  # 5-5-5
 		self.databases = []
 		for i in range(len(self.patterns)):
-			file = "DATABASE_4_4_4_3-" + str(i + 1)
+			file = "DATABASE_5_5_5-" + str(i + 1)
 			with open("./databases/" + file, 'r') as f:
 				self.databases.append(load(f))
 

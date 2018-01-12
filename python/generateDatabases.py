@@ -121,7 +121,7 @@ if __name__ == '__main__':
 	# 		print("CACHE LEN = ", len(pdbs[i].cache))
 	# 		dump(pdbs[i].cache, out)
 	for i in range(len(patterns)):
-		file = "DATABASE_4_4_4_3-" + str(i + 1)
+		file = "DATABASE_5_5_5-" + str(i + 1)
 		with open("../databases/" + file, 'w') as out:
 			print("CACHE LEN = ", len(pdbs[i].cache))
 			dump(pdbs[i].cache, out)
