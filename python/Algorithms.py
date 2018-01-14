@@ -64,10 +64,24 @@ class Algorithms():
 					if self.not_in(opened, child):
 						opened.append(child)
 
+	def print_fie(self, field):
+		k = 0
+		for i in range(self.size):
+			for j in range(self.size):
+				print(field[k], end=" ")
+				k += 1
+			print("")
+		print("----------------------------")
+
+	def debag(self, set):
+		for elem in set:
+			self.print_fie(elem.field)
+
 	def bfs(self, startNode):
 		opened = deque()
 		closed = set()
 		opened.append(startNode)
+		# i = 0
 		while opened:
 			current = opened.popleft()
 
@@ -79,6 +93,15 @@ class Algorithms():
 					child.setParent(current)
 					if self.not_in(opened, child):
 						opened.append(child)
+			# if i == 1:
+			# 	print("CLOSED")
+			# 	for elem in closed:
+			# 		elem = list(map(int, elem))
+			# 		self.print_fie(elem)
+			# 	print("OPENED")
+			# 	self.debag(opened)
+			# 	break
+			# i += 1
 
 	def solve(self, startField):
 		sol = None

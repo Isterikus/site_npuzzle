@@ -36,28 +36,6 @@ int		abs(int x)
 		return x;
 }
 
-int		getH(int *field)
-{
-	char	*heu;
-	char	*temp;
-	int		h;
-
-	temp = strdup(heuristics);
-	heu = strtok(temp, "+");
-	h = 0;
-	while (heu != NULL) {
-		if (strcmp(heu, "manhattan") == 0) {
-			h += getManhattan(field);
-		} else if (strcmp(heu, "linear") == 0) {
-			h += getLinearConflict(field);
-		} else if (strcmp(heu, "linear2") == 0) {
-			h += getLinearConflictMine(field);
-		}
-		heu = strtok(NULL, "+");
-	}
-	return h;
-}
-
 int		getManhattan(int *field)
 {
 	int		i;
@@ -161,6 +139,35 @@ int		getLinearConflictMine(int *field)
 		i++;
 	}
 	return ret;
+}
+
+int		getPatternDatabase(int *field)
+{
+	return 0;
+}
+
+int		getH(int *field)
+{
+	char	*heu;
+	char	*temp;
+	int		h;
+
+	temp = strdup(heuristics);
+	heu = strtok(temp, "+");
+	h = 0;
+	while (heu != NULL) {
+		if (strcmp(heu, "manhattan") == 0) {
+			h += getManhattan(field);
+		} else if (strcmp(heu, "linear") == 0) {
+			h += getLinearConflict(field);
+		} else if (strcmp(heu, "linear2") == 0) {
+			h += getLinearConflictMine(field);
+		} else if (strcmp(heu, "patternDatabase") == 0) {
+			h += getPatternDatabase(field);
+		}
+		heu = strtok(NULL, "+");
+	}
+	return h;
 }
 
 int		compare_array(int *field1, int *field2)
@@ -517,6 +524,71 @@ void	aStar(int *initial_field)
 	free(initial);
 }
 
+t_state	*popleft(t_sts **list)
+{
+	t_state	*ret;
+	t_sts	*fr;
+
+	ret = (*list)->state;
+	fr = (*list);
+	(*list) = (*list)->next;
+	free(fr);
+	return ret;
+}
+
+void	bfs(int *initial_field)
+{
+	t_state	*initial;
+	t_state	*current;
+	t_sts	*closed;
+	t_sts	*opened;
+	t_state	*succ;
+	int		i;
+
+	initial = (t_state *)malloc(sizeof(t_state));
+	initial->g = 0;
+	initial->field = initial_field;
+	initial->parent = NULL;
+	opened = (t_sts *)malloc(sizeof(t_sts));
+	closed = (t_sts *)malloc(sizeof(t_sts));
+	opened->state = initial;
+	closed->state = NULL;
+	opened->next = NULL;
+	closed->next = NULL;
+	print_field(initial);
+	while(opened) {
+		current = popleft(&opened);
+		if (ansver(current->field)) {
+			print_way(current);
+			free(initial);
+			return;
+		}
+		add_node(closed, current);
+		i = 1;
+		while (i < 5) {
+			succ = find_neighbor(i, current->field);
+			if (succ == NULL) {
+				i++;
+				continue;
+			}
+			if (current->parent && compare_array(current->parent->field, succ->field)) {
+				free(succ->field);
+				free(succ);
+				i++;
+				continue;
+			}
+			if (not_in(closed, succ)) {
+				succ->parent = current;
+				if (not_in(opened, succ)) {
+					append(&opened, succ);
+				}
+			}
+			i++;
+		}
+	}
+	free(initial);
+}
+
 void	python(int sz, char *field, char *algo, char *heurs)
 {
 	int		*initial_field;
@@ -543,6 +615,8 @@ void	python(int sz, char *field, char *algo, char *heurs)
 		idaStar(initial_field);
 	} else if (strcmp("aStar", algo) == 0) {
 		aStar(initial_field);
+	} else if (strcmp("bfs", algo) == 0) {
+		bfs(initial_field);
 	}
 	free(left_range);
 	free(right_range);
