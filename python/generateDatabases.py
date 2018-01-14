@@ -8,7 +8,8 @@ size = 4
 all_cells = pow(size, 2)
 # patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]] # 7-8
 # patterns = [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15]] # 6-6-3
-patterns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]] # 5-5-5
+# patterns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]] # 5-5-5 1
+patterns = [[1, 2, 3, 5, 6], [4, 7, 8, 11, 12], [9, 10, 13, 14, 15]] # 5-5-5 2
 # patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]] # 4-4-4-3
 pdbs = []
 
@@ -72,8 +73,8 @@ def train_pattern(goal, pattern):
 		# if current.getG() > max_train_dep: break
 		# if len(db.cache) >= 32760:
 		# 	break
-		if len(db.cache) % 100000 == 0:
-			print("ONE THOUSAND")
+		# if len(db.cache) % 100000 == 0:
+		# 	print("ONE THOUSAND")
 
 		for child in current.getChildrens():
 			child.setParent(current)

@@ -4,10 +4,13 @@ int		*left_range;
 int		*right_range;
 int		*top_range;
 int		*bottom_range;
-int		*database;
 int		n;
 int		size;
 char	*heuristics;
+t_db	*database1;
+t_db	*database2;
+t_db	*database3;
+int		patterns[3][5] = {{1, 2, 3, 5, 6}, {4, 7, 8, 11, 12}, {9, 10, 13, 14, 15}};
 
 void	set_range()
 {
@@ -24,6 +27,76 @@ void	set_range()
 		right_range[i] = (i + 1) * n - 1;
 		top_range[i] = i;
 		bottom_range[i] = size - i - 1;
+		i++;
+	}
+}
+
+t_db	*database(char *data, int len)
+{
+	int		i;
+	int		j;
+	t_db	*start;
+	t_db	*temp;
+
+	i = 0;
+	start = (t_db *)malloc(sizeof(t_db));
+	start->next = NULL;
+	temp = start;
+	while (i < len) {
+		while (data[i] != '"') {
+			i++;
+		}
+		i++;
+		j = 0;
+		while (data[i] != '"') {
+			temp->field[j++] = data[i++];
+		}
+		temp->field[j] = '\0';
+		i += 3;
+		temp->val = 0;
+		while (data[i] != ',') {
+			if (data[i] == '}') {
+				return start;
+			}
+			temp->val = temp->val * 10 + data[i++] - 48;
+		}
+		temp->next = (t_db *)malloc(sizeof(t_db));
+		temp = temp->next;
+		temp->next = NULL;
+	}
+	return start;
+}
+
+void	readDatabases()
+{
+	char	*db;
+	FILE	*fp;
+	int		readed;
+	int		iter;
+	char	file[] = "../databases/DATABASE_5_5_5-\0\0";
+
+	int i = 1;
+	while (i < 4) {
+		db = (char *)malloc(sizeof(char) * 15189741);
+		fp = fopen(ft_strcat(file, ft_itoa(i)), "r");
+		file[28] = '\0';
+		readed = 0;
+		while (42) {
+			iter = fread(db + readed, sizeof(char), 1000000, fp);
+			readed += iter;
+			if (iter < 1000000) {
+				break;
+			}
+		}
+		db[readed] = '\0';
+		if (i == 1) {
+			database1 = database(db, readed);
+		} else if (i == 2) {
+			database2 = database(db, readed);
+		} else if (i == 3) {
+			database3 = database(db, readed);
+		}
+		fclose(fp);
 		i++;
 	}
 }
@@ -141,8 +214,72 @@ int		getLinearConflictMine(int *field)
 	return ret;
 }
 
+/*
+
+	def code(self, pattern):
+		code = ""
+		for val in self.field:
+			if val not in pattern:
+				code += "0"
+			elif val == 0:
+				code += "0"
+			else:
+				code += str(val)
+		return code
+*/
+
+
+int		in_array(int *arr, int val)
+{
+	int		i;
+
+	i = 0;
+	while (i < 5) {
+		if (arr[i] == val) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+// char	*hash(int *field, int *pattern)
+// {
+// 	char	*code;
+
+// 	// code = (char *)malloc(sizeof(char) * );
+// 	// if ()
+// }
+
+// int		find_db(t_db *db, char *h)
+// {
+// 	t_db	*copy;
+
+// 	copy = db;
+// 	while (copy != NULL) {
+// 		copy = copy->next;
+// 	}
+// }
+
 int		getPatternDatabase(int *field)
 {
+	field[0] = field[0];
+	// t_db	*db;
+	// int		i;
+	// int		h;
+	// char	*hash;
+
+	// i = 1;
+	// h = 0;
+	// while (i < 4) {
+	// 	if (i == 1) {
+	// 		hash = (char *)malloc(sizeof(char));
+	// 		// h += find_db(database1, hash);
+	// 	} else if (i == 2) {
+
+	// 	} else if (i == 3) {
+
+	// 	}
+	// }
 	return 0;
 }
 
@@ -163,7 +300,8 @@ int		getH(int *field)
 		} else if (strcmp(heu, "linear2") == 0) {
 			h += getLinearConflictMine(field);
 		} else if (strcmp(heu, "patternDatabase") == 0) {
-			h += getPatternDatabase(field);
+			// h += getPatternDatabase(field);
+			h += getManhattan(field);
 		}
 		heu = strtok(NULL, "+");
 	}
@@ -225,12 +363,12 @@ void	print_way(t_state *node)
 {
 	int		len = 0;
 
-	// while (node != NULL)
-	// {
-	// 	print_field(node);
-	// 	node = node->parent;
-	// 	len++;
-	// }
+	while (node != NULL)
+	{
+		// print_field(node);
+		node = node->parent;
+		len++;
+	}
 	printf("LEN = %d\n", len);
 }
 
@@ -589,6 +727,22 @@ void	bfs(int *initial_field)
 	free(initial);
 }
 
+int		checkHeur(char *check)
+{
+	char	*heu;
+	char	*temp;
+
+	temp = strdup(heuristics);
+	heu = strtok(temp, "+");
+	while (heu != NULL) {
+		if (strcmp(heu, check) == 0) {
+			return 1;
+		}
+		heu = strtok(NULL, "+");
+	}
+	return 0;
+}
+
 void	python(int sz, char *field, char *algo, char *heurs)
 {
 	int		*initial_field;
@@ -610,6 +764,9 @@ void	python(int sz, char *field, char *algo, char *heurs)
 		j++;
 	}
 	set_range();
+	if (checkHeur("patternDatabase")) {
+		readDatabases();
+	}
 	heuristics = heurs;
 	if (strcmp("idaStar", algo) == 0) {
 		idaStar(initial_field);

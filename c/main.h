@@ -7,6 +7,8 @@
 #include <string.h>
 #include "libft/printf_functions/includes/header.h"
 
+#define BUFF_SIZE 1000000
+
 typedef struct		s_state
 {
 	int				*field;
@@ -20,6 +22,13 @@ typedef struct		s_sts
 	t_state			*state;
 	struct s_sts	*next;
 }					t_sts;
+
+typedef struct		s_db
+{
+	char			field[22];
+	int				val;
+	struct s_db		*next;
+}					t_db;
 
 void	set_range();
 int		abs(int x);
