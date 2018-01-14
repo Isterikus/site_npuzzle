@@ -12,7 +12,7 @@
 
 <body>
 	<h1 class="h_main">Sliding puzzle</h1>
-	<div id="loader"></div>
+	<div id="loader" style="display: none;"></div>
 	<div class="col-sm-12 col-md-8">
 		<div id="puzzle" class="puzzleTable">
 		</div>
@@ -123,9 +123,6 @@ var field_static = 5;
 $('#manhattan').prop('checked', true);
 $('#linear').prop('checked', true);
 $('#patternDatabase').attr("disabled", true);
-// $('#loader').css('opacity', '0');
-$('#loader').css('left', window.innerWidth / 2 - 60);
-$('#loader').css('top', window.innerHeight / 2 - 60);
 
 function setPuzzle(custom) {
 	var size = Number($('#size').val());
@@ -190,6 +187,7 @@ function setHeuristicTypes() {
 
 function request(page, dataSend) {
 	$.ajax({
+		async:false,
 		type: 'POST',
 		url: page,
 		data: dataSend,
@@ -197,8 +195,11 @@ function request(page, dataSend) {
 			ret = $.parseJSON(translated);
 			// return translated;
 		},
-		async:false
+		complete: function () {
+			$('#loader').hide();
+		},
 	});
+	// hideWait();
 	return ret;
 }
 
@@ -472,16 +473,13 @@ function findZero(fie) {
 }
 
 function showWait() {
-	$('#loader').css('opacity', '1');
-	console.log("LOA", $('#loader'));
+	$('#loader').show();
 	$('#loader').css('left', window.innerWidth / 2 - 60);
 	$('#loader').css('top', window.innerHeight / 2 - 60);
 }
 
 function hideWait() {
-	// $('#loader').hide();
-	// $('#loader').css('visibility', 'hidden');
-	$('#loader').css('opacity', '0');
+	$('#loader').hide();
 }
 
 $('#file_load').change(function() {
@@ -522,99 +520,100 @@ $('#random').click(function () {
 });
 
 $('#solve').click(function () {
-	console.log("WTF = ", $('#loader').css('opacity'));
-	$('#loader').css('opacity', '1');
-	console.log("WTF2 = ", $('#loader').css('opacity'));
-	var size = Number($('#size').val());
-	var algorithmType = $('#algorithmType').val();
-	var manhattan = ($('#manhattan').prop('checked')) ? 1 : 0;
-	var linear = ($('#linear').prop('checked')) ? 1 : 0;
-	var linear2 = ($('#linear2').prop('checked')) ? 1 : 0;
-	var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
-	var tilesOut = ($('#tilesOut').prop('checked')) ? 1 : 0;
-	var euqlidian = ($('#euqlidian').prop('checked')) ? 1 : 0;
-	var misplacedTiles = ($('#misplacedTiles').prop('checked')) ? 1 : 0;
+	$('#loader').show();
+	$('#loader').css('left', window.innerWidth / 2 - 60);
+	$('#loader').css('top', window.innerHeight / 2 - 60);
+	setTimeout(function() {
+		var size = Number($('#size').val());
+		var algorithmType = $('#algorithmType').val();
+		var manhattan = ($('#manhattan').prop('checked')) ? 1 : 0;
+		var linear = ($('#linear').prop('checked')) ? 1 : 0;
+		var linear2 = ($('#linear2').prop('checked')) ? 1 : 0;
+		var patternDatabase = ($('#patternDatabase').prop('checked')) ? 1 : 0;
+		var tilesOut = ($('#tilesOut').prop('checked')) ? 1 : 0;
+		var euqlidian = ($('#euqlidian').prop('checked')) ? 1 : 0;
+		var misplacedTiles = ($('#misplacedTiles').prop('checked')) ? 1 : 0;
 
-	var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian, misplacedTiles];
-	freeInfo();
-	if (!validateSolve(size, algorithmType, heuristics)) {
-		return;
-	}
-	var field = "";
-	for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-			val = $('#tile-' + i + '-' + j).html();
-			if (!val) {
-				field += '0';
-			} else {
-				field += val;
-			}
-			if (!(i == size - 1 && j == size - 1)) {
-				field += ',';
-			}
+		var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian, misplacedTiles];
+		freeInfo();
+		if (!validateSolve(size, algorithmType, heuristics)) {
+			return;
 		}
-	}
-	if (!validatePath(field.split(','))) {
-		return;
-	}
-	showWait();
-	heur = "";
-	for (var i = 0; i < heuristics.length; i++) {
-		if (heuristics[i] == 1) {
-			if (i == 0) {
-				heur += "manhattan+";
-			} else if (i == 1) {
-				heur += "linear+";
-			} else if (i == 2) {
-				heur += "linear2+";
-			} else if (i == 3) {
-				heur += "patternDatabase+";
-			} else if (i == 4) {
-				heur += "tilesOut+";
-			} else if (i == 5) {
-				heur += "euclideanDistance+";
-			} else if (i == 6) {
-				heur += "misplacedTiles+";
+		var field = "";
+		for (var i = 0; i < size; i++) {
+			for (var j = 0; j < size; j++) {
+				val = $('#tile-' + i + '-' + j).html();
+				if (!val) {
+					field += '0';
+				} else {
+					field += val;
+				}
+				if (!(i == size - 1 && j == size - 1)) {
+					field += ',';
+				}
 			}
 		}
-	}
-	heur = heur.slice(0, -1);
-	data = {size: size, field: field, algo: algorithmType, heuristics: heur};
-	ret = request('solve', data);
-	$("#timePython").html(ret['python_time']);
-	$("#timeC").html(ret['c_time']);
-	$('#moves').html(ret['solution'].length);
-	solution = ret['solution'];
-	var str = "";
-	var fie = field.split(',');
-	// var all_cells = Math.pow(size, 2);
-	var z = {'i': 0, 'j': 0};
-	for (var i = 0; i < solution.length; i++) {
-		move = solution.charAt(i);
-		zero = findZero(fie);
-		console.log("ZERO = ", zero);
-		z['i'] = parseInt(zero / size);
-		z['j'] = parseInt(zero % size);
-		if (move == 'l') {
-			str += "right(" + (z['i']) + "," + (z['j'] - 1) + ") | ";
-			fie[zero] = fie[zero - 1];
-			fie[zero - 1] = 0;
-		} else if (move == 'r') {
-			str += "left(" + (z['i']) + "," + (z['j'] + 1) + ") | ";
-			fie[zero] = fie[zero + 1];
-			fie[zero + 1] = 0;
-		} else if (move == 't') {
-			str += "bottom(" + (z['i'] - 1) + "," + (z['j']) + ") | ";
-			fie[zero] = fie[zero - size];
-			fie[zero - size] = 0;
-		} else if (move == 'b') {
-			str += "top(" + (z['i'] + 1) + "," + (z['j']) + ") | ";
-			fie[zero] = fie[zero + size];
-			fie[zero + size] = 0;
+		if (!validatePath(field.split(','))) {
+			return;
 		}
-	}
-	$('#way').html(str);
-	hideWait();
+		// showWait();
+		heur = "";
+		for (var i = 0; i < heuristics.length; i++) {
+			if (heuristics[i] == 1) {
+				if (i == 0) {
+					heur += "manhattan+";
+				} else if (i == 1) {
+					heur += "linear+";
+				} else if (i == 2) {
+					heur += "linear2+";
+				} else if (i == 3) {
+					heur += "patternDatabase+";
+				} else if (i == 4) {
+					heur += "tilesOut+";
+				} else if (i == 5) {
+					heur += "euclideanDistance+";
+				} else if (i == 6) {
+					heur += "misplacedTiles+";
+				}
+			}
+		}
+		heur = heur.slice(0, -1);
+		data = {size: size, field: field, algo: algorithmType, heuristics: heur};
+		ret = request('solve', data);
+		$("#timePython").html(ret['python_time']);
+		$("#timeC").html(ret['c_time']);
+		$('#moves').html(ret['solution'].length);
+		solution = ret['solution'];
+		var str = "";
+		var fie = field.split(',');
+		// var all_cells = Math.pow(size, 2);
+		var z = {'i': 0, 'j': 0};
+		for (var i = 0; i < solution.length; i++) {
+			move = solution.charAt(i);
+			zero = findZero(fie);
+			console.log("ZERO = ", zero);
+			z['i'] = parseInt(zero / size);
+			z['j'] = parseInt(zero % size);
+			if (move == 'l') {
+				str += "right(" + (z['i']) + "," + (z['j'] - 1) + ") | ";
+				fie[zero] = fie[zero - 1];
+				fie[zero - 1] = 0;
+			} else if (move == 'r') {
+				str += "left(" + (z['i']) + "," + (z['j'] + 1) + ") | ";
+				fie[zero] = fie[zero + 1];
+				fie[zero + 1] = 0;
+			} else if (move == 't') {
+				str += "bottom(" + (z['i'] - 1) + "," + (z['j']) + ") | ";
+				fie[zero] = fie[zero - size];
+				fie[zero - size] = 0;
+			} else if (move == 'b') {
+				str += "top(" + (z['i'] + 1) + "," + (z['j']) + ") | ";
+				fie[zero] = fie[zero + size];
+				fie[zero + size] = 0;
+			}
+		}
+		$('#way').html(str);
+	}, 0);
 });
 
 $(document).ready(function () {
