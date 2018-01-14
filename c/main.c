@@ -37,6 +37,9 @@ t_db	*database(char *data, int len)
 	int		j;
 	t_db	*start;
 	t_db	*temp;
+	char	field[22];
+	int		k;
+	int		val;
 
 	i = 0;
 	start = (t_db *)malloc(sizeof(t_db));
@@ -49,20 +52,39 @@ t_db	*database(char *data, int len)
 		i++;
 		j = 0;
 		while (data[i] != '"') {
-			temp->field[j++] = data[i++];
+			field[j++] = data[i++];
 		}
-		temp->field[j] = '\0';
+		field[j] = '\0';
 		i += 3;
-		temp->val = 0;
+		val = 0;
 		while (data[i] != ',') {
 			if (data[i] == '}') {
 				return start;
 			}
-			temp->val = temp->val * 10 + data[i++] - 48;
+			val = val * 10 + data[i++] - 48;
 		}
-		temp->next = (t_db *)malloc(sizeof(t_db));
-		temp = temp->next;
-		temp->next = NULL;
+		k = 0;
+		temp = start;
+		while (k < j) {
+			if (!temp->next) {
+				temp->next = (t_db **)malloc(sizeof(t_db) * 10);
+				for (int u = 0; u < 10; u++) {
+					temp->next[u] = (t_db *)malloc(sizeof(t_db));
+					temp->next[u]->next = NULL;
+				}
+			}
+			// printf("[%c]\n", field[k]);
+			temp = temp->next[field[k] - 48];
+			k++;
+		}
+		// for (int u = 0; u < strlen(field); u++) {
+		// 	temp->field[u] = field[u];
+		// }
+		// temp->field = strdup(field);
+		temp->val = val;
+		// temp->next = (t_db *)malloc(sizeof(t_db));
+		// temp = temp->next;
+		// temp->next = NULL;
 	}
 	return start;
 }
@@ -73,13 +95,13 @@ void	readDatabases()
 	FILE	*fp;
 	int		readed;
 	int		iter;
-	char	file[] = "../databases/DATABASE_5_5_5-\0\0";
+	char	file[] = "databases/DATABASE_5_5_5-\0\0";
 
 	int i = 1;
 	while (i < 4) {
 		db = (char *)malloc(sizeof(char) * 15189741);
 		fp = fopen(ft_strcat(file, ft_itoa(i)), "r");
-		file[28] = '\0';
+		file[25] = '\0';
 		readed = 0;
 		while (42) {
 			iter = fread(db + readed, sizeof(char), 1000000, fp);
@@ -238,7 +260,7 @@ void	hash(char **str, int *field, int *pattern)
 		if (!in_array(pattern, field[i])) {
 			(*str)[j] = '0';
 		} else {
-			if (field[i] > 10) {
+			if (field[i] > 9) {
 				(*str)[j++] = '1';
 				(*str)[j] = field[i] % 10 + 48;
 			} else {
@@ -251,18 +273,18 @@ void	hash(char **str, int *field, int *pattern)
 	(*str)[j] = '\0';
 }
 
-int		find_db(t_db *db, char *h)
+int		find_db(t_db *db, char *hash)
 {
-	t_db	*copy;
+	int		i;
+	t_db	*temp;
 
-	copy = db;
-	while (copy != NULL) {
-		if (strcmp(h, copy->field) == 0) {
-			return copy->val;
-		}
-		copy = copy->next;
+	i = 0;
+	temp = db;
+	while (i < strlen(hash)) {
+		temp = temp->next[hash[i] - 48];
+		i++;
 	}
-	return -1;
+	return temp->val;
 }
 
 int		getPatternDatabase(int *field)
@@ -310,10 +332,10 @@ int		getH(int *field)
 			h += getLinearConflictMine(field);
 		} else if (strcmp(heu, "patternDatabase") == 0) {
 			h += getPatternDatabase(field);
+			// h += getManhattan(field) + getLinearConflictMine(field);
 		}
 		heu = strtok(NULL, "+");
 	}
-	// printf("H = %d\n", h);
 	return h;
 }
 
@@ -353,7 +375,7 @@ void	print_field(t_state *node)
 	int		j;
 
 	i = 0;
-	printf("H = %d\n", node->h);
+	// printf("H = %d\n", node->h);
 	while (i < n)
 	{
 		j = 0;
@@ -510,6 +532,7 @@ void	idaStar(int *initial_field)
 	initial->field = initial_field;
 	initial->parent = NULL;
 	bound = getH(initial->field);
+	// print_field(initial);
 	while (1)
 	{
 		t = search(initial, 0, bound);
@@ -787,7 +810,7 @@ float	python(int sz, char *field, char *algo, char *heurs)
 		bfs(initial_field);
 	}
 	gettimeofday(&stop, NULL);
-	printf("took %f\n", (stop.tv_sec - start.tv_sec) * 1000.0f + (stop.tv_usec - start.tv_usec) / 1000.0f);
+	// printf("took %f\n", (stop.tv_sec - start.tv_sec) * 1000.0f + (stop.tv_usec - start.tv_usec) / 1000.0f);
 	free(left_range);
 	free(right_range);
 	free(top_range);

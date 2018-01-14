@@ -17,7 +17,6 @@ class Heuristics():
 			file = "DATABASE_5_5_5-" + str(i + 1)
 			with open("./databases/" + file, 'r') as f:
 				self.databases.append(load(f))
-			print(len(self.databases[0]))
 
 	def realPositions(self):
 		for c in range(1, self.all_cells):

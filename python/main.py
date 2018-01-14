@@ -68,7 +68,7 @@ def from_site(size, path, algo, heuristics):
 		to_c += "," + str(el)
 	to_c = to_c[1:]
 
-	print("to c = ", to_c)
+	# print("to c = ", to_c)
 	c_module = CDLL('./adder.so')
 	to_c = c_char_p(to_c.encode('utf-8'))
 	algo_c = c_char_p(algo.encode('utf-8'))
@@ -77,11 +77,11 @@ def from_site(size, path, algo, heuristics):
 	c_module.python.restype = c_float
 	c_time2 = c_module.python(size, to_c, algo_c, heuristics_c)
 	c_time = time() - start_c
-	print("C TIME = ", c_time)
-	print("C TIME2 = ", c_time2)
+	# print("C TIME = ", c_time)
+	# print("C TIME2 = ", c_time2)
 	# call(["./a.out", str(size), to_c])
-	print("TIME = ", rez['time'])
-	return {'c_time': c_time, 'python_time': rez['time'], 'solution': solution}
+	# print("TIME = ", rez['time'])
+	return {'c_time': c_time2 / 1000.0, 'python_time': rez['time'], 'solution': solution}
 	# return {'time': rez['time']}
 
 if __name__ == "__main__":

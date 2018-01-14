@@ -25,9 +25,9 @@ typedef struct		s_sts
 
 typedef struct		s_db
 {
-	char			field[22];
+	// char			field[22];
 	int				val;
-	struct s_db		*next;
+	struct s_db		**next;
 }					t_db;
 
 void	set_range();
