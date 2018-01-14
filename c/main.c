@@ -214,73 +214,82 @@ int		getLinearConflictMine(int *field)
 	return ret;
 }
 
-/*
-
-	def code(self, pattern):
-		code = ""
-		for val in self.field:
-			if val not in pattern:
-				code += "0"
-			elif val == 0:
-				code += "0"
-			else:
-				code += str(val)
-		return code
-*/
-
-
 int		in_array(int *arr, int val)
 {
 	int		i;
 
 	i = 0;
 	while (i < 5) {
-		if (arr[i] == val) {
+		if (arr[i++] == val) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
-// char	*hash(int *field, int *pattern)
-// {
-// 	char	*code;
+void	hash(char **str, int *field, int *pattern)
+{
+	int		i;
+	int		j;
 
-// 	// code = (char *)malloc(sizeof(char) * );
-// 	// if ()
-// }
+	i = 0;
+	j = 0;
+	while (i < size) {
+		if (!in_array(pattern, field[i])) {
+			(*str)[j] = '0';
+		} else {
+			if (field[i] > 10) {
+				(*str)[j++] = '1';
+				(*str)[j] = field[i] % 10 + 48;
+			} else {
+				(*str)[j] = field[i] % 10 + 48;
+			}
+		}
+		j++;
+		i++;
+	}
+	(*str)[j] = '\0';
+}
 
-// int		find_db(t_db *db, char *h)
-// {
-// 	t_db	*copy;
+int		find_db(t_db *db, char *h)
+{
+	t_db	*copy;
 
-// 	copy = db;
-// 	while (copy != NULL) {
-// 		copy = copy->next;
-// 	}
-// }
+	copy = db;
+	while (copy != NULL) {
+		if (strcmp(h, copy->field) == 0) {
+			return copy->val;
+		}
+		copy = copy->next;
+	}
+	return -1;
+}
 
 int		getPatternDatabase(int *field)
 {
-	field[0] = field[0];
-	// t_db	*db;
-	// int		i;
-	// int		h;
-	// char	*hash;
+	int		i;
+	int		h;
+	char	*hs;
 
-	// i = 1;
-	// h = 0;
-	// while (i < 4) {
-	// 	if (i == 1) {
-	// 		hash = (char *)malloc(sizeof(char));
-	// 		// h += find_db(database1, hash);
-	// 	} else if (i == 2) {
-
-	// 	} else if (i == 3) {
-
-	// 	}
-	// }
-	return 0;
+	i = 1;
+	h = 0;
+	while (i < 4) {
+		if (i == 1) {
+			hs = (char *)malloc(sizeof(char) * 17);
+			hash(&hs, field, patterns[0]);
+			h += find_db(database1, hs);
+		} else if (i == 2) {
+			hs = (char *)malloc(sizeof(char) * 19);
+			hash(&hs, field, patterns[1]);
+			h += find_db(database2, hs);
+		} else if (i == 3) {
+			hs = (char *)malloc(sizeof(char) * 21);
+			hash(&hs, field, patterns[2]);
+			h += find_db(database3, hs);
+		}
+		i++;
+	}
+	return h;
 }
 
 int		getH(int *field)
@@ -300,11 +309,11 @@ int		getH(int *field)
 		} else if (strcmp(heu, "linear2") == 0) {
 			h += getLinearConflictMine(field);
 		} else if (strcmp(heu, "patternDatabase") == 0) {
-			// h += getPatternDatabase(field);
-			h += getManhattan(field);
+			h += getPatternDatabase(field);
 		}
 		heu = strtok(NULL, "+");
 	}
+	// printf("H = %d\n", h);
 	return h;
 }
 
@@ -743,11 +752,12 @@ int		checkHeur(char *check)
 	return 0;
 }
 
-void	python(int sz, char *field, char *algo, char *heurs)
+float	python(int sz, char *field, char *algo, char *heurs)
 {
-	int		*initial_field;
-	int		i;
-	int		j;
+	int				*initial_field;
+	int				i;
+	int				j;
+	struct timeval	stop, start;
 
 	n = sz;
 	size = n * n;
@@ -764,10 +774,11 @@ void	python(int sz, char *field, char *algo, char *heurs)
 		j++;
 	}
 	set_range();
+	heuristics = heurs;
 	if (checkHeur("patternDatabase")) {
 		readDatabases();
 	}
-	heuristics = heurs;
+	gettimeofday(&start, NULL);
 	if (strcmp("idaStar", algo) == 0) {
 		idaStar(initial_field);
 	} else if (strcmp("aStar", algo) == 0) {
@@ -775,40 +786,44 @@ void	python(int sz, char *field, char *algo, char *heurs)
 	} else if (strcmp("bfs", algo) == 0) {
 		bfs(initial_field);
 	}
+	gettimeofday(&stop, NULL);
+	printf("took %f\n", (stop.tv_sec - start.tv_sec) * 1000.0f + (stop.tv_usec - start.tv_usec) / 1000.0f);
 	free(left_range);
 	free(right_range);
 	free(top_range);
 	free(bottom_range);
+	return (stop.tv_sec - start.tv_sec) * 1000.0f + (stop.tv_usec - start.tv_usec) / 1000.0f;
 }
 
 int		main(int argc, char const *argv[])
 {
-	int		*initial_field;
-	int		i;
-	int		j;
+	python(4, "9,15,10,13,4,8,3,5,11,14,0,6,1,2,7,12", "idaStar", "patternDatabase");
+	// int		*initial_field;
+	// int		i;
+	// int		j;
 
-	if (argc != 3)
-		return 0;
-	printf("START C\n");
-	n = atoi(argv[1]);
-	size = n * n;
-	initial_field = (int *)malloc(sizeof(int) * size);
-	i = 0;
-	j = 0;
-	while (argv[2][i])
-	{
-		initial_field[j] = 0;
-		while (argv[2][i] && argv[2][i] != ',')
-			initial_field[j] = initial_field[j] * 10 + argv[2][i++] - 48;
-		if (argv[2][i])
-			i++;
-		j++;
-	}
-	set_range();
-	aStar(initial_field);
-	free(left_range);
-	free(right_range);
-	free(top_range);
-	free(bottom_range);
+	// if (argc != 3)
+	// 	return 0;
+	// printf("START C\n");
+	// n = atoi(argv[1]);
+	// size = n * n;
+	// initial_field = (int *)malloc(sizeof(int) * size);
+	// i = 0;
+	// j = 0;
+	// while (argv[2][i])
+	// {
+	// 	initial_field[j] = 0;
+	// 	while (argv[2][i] && argv[2][i] != ',')
+	// 		initial_field[j] = initial_field[j] * 10 + argv[2][i++] - 48;
+	// 	if (argv[2][i])
+	// 		i++;
+	// 	j++;
+	// }
+	// set_range();
+	// aStar(initial_field);
+	// free(left_range);
+	// free(right_range);
+	// free(top_range);
+	// free(bottom_range);
 	return 0;
 }

@@ -70,21 +70,15 @@ def from_site(size, path, algo, heuristics):
 
 	print("to c = ", to_c)
 	c_module = CDLL('./adder.so')
-	# to_c = c_char_p(to_c.encode('utf-8'))
-	# algo_c = c_char_p(algo.encode('utf-8'))
-	# heuristics_c = c_char_p(heuristics.encode('utf-8'))
-	# if "patternDatabase" in heuristics.split('+'):
-	# 	database = ((c_int * 524160) * 3)
-	# 	database[0] = f.heuristics.databases[0]
-	# 	database[1] = f.heuristics.databases[1]
-	# 	database[2] = f.heuristics.databases[2]
+	to_c = c_char_p(to_c.encode('utf-8'))
+	algo_c = c_char_p(algo.encode('utf-8'))
+	heuristics_c = c_char_p(heuristics.encode('utf-8'))
 	start_c = time()
-	# 	c_module.python(size, to_c, algo_c, heuristics_c, database)
-	# else:
-	# 	start_c = time()
-	# 	c_module.python(size, to_c, algo_c, heuristics_c, None)
+	c_module.python.restype = c_float
+	c_time2 = c_module.python(size, to_c, algo_c, heuristics_c)
 	c_time = time() - start_c
 	print("C TIME = ", c_time)
+	print("C TIME2 = ", c_time2)
 	# call(["./a.out", str(size), to_c])
 	print("TIME = ", rez['time'])
 	return {'c_time': c_time, 'python_time': rez['time'], 'solution': solution}
