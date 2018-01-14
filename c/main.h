@@ -30,6 +30,12 @@ typedef struct		s_db
 	struct s_db		**next;
 }					t_db;
 
+typedef struct		s_realPos
+{
+	int				i;
+	int				j;
+}					t_realPos;
+
 void	set_range();
 int		abs(int x);
 int		getH(int *field);

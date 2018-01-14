@@ -11,8 +11,8 @@
 </head>
 
 <body>
-		<h1 class="h_main">Sliding puzzle</h1>
-
+	<h1 class="h_main">Sliding puzzle</h1>
+	<div id="loader"></div>
 	<div class="col-sm-12 col-md-8">
 		<div id="puzzle" class="puzzleTable">
 		</div>
@@ -101,6 +101,10 @@
 				<label for="timeC" class="col-sm-5">Time C:</label>
 				<span id="timeC" class="col-sm-7"></span>
 			</div>
+			<div class="col-sm-12">
+				<label for="way" class="col-sm-5">Way:</label>
+				<span id="way" class="col-sm-7"></span>
+			</div>
 		</div>
 	</div>
 
@@ -119,6 +123,9 @@ var field_static = 5;
 $('#manhattan').prop('checked', true);
 $('#linear').prop('checked', true);
 $('#patternDatabase').attr("disabled", true);
+// $('#loader').css('opacity', '0');
+$('#loader').css('left', window.innerWidth / 2 - 60);
+$('#loader').css('top', window.innerHeight / 2 - 60);
 
 function setPuzzle(custom) {
 	var size = Number($('#size').val());
@@ -248,7 +255,9 @@ function play_solution() {
 		delay_loop(0, before);
 	}
 }
+
 console.log($('.actionButtons'));
+
 function delay_loop(i, before) {
     // start a delay
     setTimeout(function(){
@@ -284,7 +293,7 @@ function delay_loop(i, before) {
 					// alert( index + ": " + value );
 					$(value).prop('disabled', false);
 				});
-			}, 500);
+			}, 1200);
 		}
 
 	}, 500);
@@ -454,6 +463,27 @@ function validateSolve(size, algo, heuristics) {
 	return true;
 }
 
+function findZero(fie) {
+	for (var i = 0; i < fie.length; i++) {
+		if (fie[i] == 0) {
+			return i;
+		}
+	}
+}
+
+function showWait() {
+	$('#loader').css('opacity', '1');
+	console.log("LOA", $('#loader'));
+	$('#loader').css('left', window.innerWidth / 2 - 60);
+	$('#loader').css('top', window.innerHeight / 2 - 60);
+}
+
+function hideWait() {
+	// $('#loader').hide();
+	// $('#loader').css('visibility', 'hidden');
+	$('#loader').css('opacity', '0');
+}
+
 $('#file_load').change(function() {
 	readSingleFile();
 	// print(str);
@@ -492,6 +522,9 @@ $('#random').click(function () {
 });
 
 $('#solve').click(function () {
+	console.log("WTF = ", $('#loader').css('opacity'));
+	$('#loader').css('opacity', '1');
+	console.log("WTF2 = ", $('#loader').css('opacity'));
 	var size = Number($('#size').val());
 	var algorithmType = $('#algorithmType').val();
 	var manhattan = ($('#manhattan').prop('checked')) ? 1 : 0;
@@ -524,6 +557,7 @@ $('#solve').click(function () {
 	if (!validatePath(field.split(','))) {
 		return;
 	}
+	showWait();
 	heur = "";
 	for (var i = 0; i < heuristics.length; i++) {
 		if (heuristics[i] == 1) {
@@ -551,6 +585,36 @@ $('#solve').click(function () {
 	$("#timeC").html(ret['c_time']);
 	$('#moves').html(ret['solution'].length);
 	solution = ret['solution'];
+	var str = "";
+	var fie = field.split(',');
+	// var all_cells = Math.pow(size, 2);
+	var z = {'i': 0, 'j': 0};
+	for (var i = 0; i < solution.length; i++) {
+		move = solution.charAt(i);
+		zero = findZero(fie);
+		console.log("ZERO = ", zero);
+		z['i'] = parseInt(zero / size);
+		z['j'] = parseInt(zero % size);
+		if (move == 'l') {
+			str += "right(" + (z['i']) + "," + (z['j'] - 1) + ") | ";
+			fie[zero] = fie[zero - 1];
+			fie[zero - 1] = 0;
+		} else if (move == 'r') {
+			str += "left(" + (z['i']) + "," + (z['j'] + 1) + ") | ";
+			fie[zero] = fie[zero + 1];
+			fie[zero + 1] = 0;
+		} else if (move == 't') {
+			str += "bottom(" + (z['i'] - 1) + "," + (z['j']) + ") | ";
+			fie[zero] = fie[zero - size];
+			fie[zero - size] = 0;
+		} else if (move == 'b') {
+			str += "top(" + (z['i'] + 1) + "," + (z['j']) + ") | ";
+			fie[zero] = fie[zero + size];
+			fie[zero + size] = 0;
+		}
+	}
+	$('#way').html(str);
+	hideWait();
 });
 
 $(document).ready(function () {

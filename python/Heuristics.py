@@ -85,9 +85,10 @@ class Heuristics():
 		h = 0
 		i = 0
 		for val in field:
-			if val == 0 and i != len(field) - 1:
-				h += 1
-			elif i // self.size != (val - 1) // self.size or i % self.size != (val - 1) % self.size:
+			if val == 0:
+				if i != len(field) - 1:
+					h += 1
+			elif i // self.size != self.real_positions[val]['i'] or i % self.size != self.real_positions[val]['j']:
 				h += 1
 			i += 1
 		return h

@@ -1,16 +1,17 @@
 #include "main.h"
 
-int		*left_range;
-int		*right_range;
-int		*top_range;
-int		*bottom_range;
-int		n;
-int		size;
-char	*heuristics;
-t_db	*database1;
-t_db	*database2;
-t_db	*database3;
-int		patterns[3][5] = {{1, 2, 3, 5, 6}, {4, 7, 8, 11, 12}, {9, 10, 13, 14, 15}};
+int			*left_range;
+int			*right_range;
+int			*top_range;
+int			*bottom_range;
+int			n;
+int			size;
+char		*heuristics;
+t_db		*database1;
+t_db		*database2;
+t_db		*database3;
+int			patterns[3][5] = {{1, 2, 3, 5, 6}, {4, 7, 8, 11, 12}, {9, 10, 13, 14, 15}};
+t_realPos	*realPos;
 
 void	set_range()
 {
@@ -27,6 +28,14 @@ void	set_range()
 		right_range[i] = (i + 1) * n - 1;
 		top_range[i] = i;
 		bottom_range[i] = size - i - 1;
+		i++;
+	}
+
+	realPos = (t_realPos *)malloc(sizeof(t_realPos) * size);
+	i = 1;
+	while (i < size) {
+		realPos[i].i = (i - 1) / n;
+		realPos[i].j = (i - 1) % n;
 		i++;
 	}
 }
@@ -134,31 +143,13 @@ int		abs(int x)
 int		getManhattan(int *field)
 {
 	int		i;
-	int		j;
 	int		ret;
-	int		pos;
-	int		pl_i;
-	int		pl_j;
 
 	ret = 0;
 	i = 0;
-	while (i < n)
-	{
-		j = 0;
-		while (j < n)
-		{
-			pos = i * n + j;
-			if (field[pos] != 0) {
-				if (field[pos] % n == 0) {
-					pl_i = field[pos] / n - 1;
-					pl_j = n - 1;
-				} else {
-					pl_i = field[pos] / n;
-					pl_j = field[pos] % n - 1;
-				}
-				ret += abs(i - pl_i) + abs(j - pl_j);
-			}
-			j++;
+	while (i < size) {
+		if (field[i] != 0) {
+			ret += abs(i / n - realPos[field[i]].i) + abs(i % n - realPos[field[i]].j);
 		}
 		i++;
 	}
@@ -314,6 +305,47 @@ int		getPatternDatabase(int *field)
 	return h;
 }
 
+int		getTilesOut(int *field)
+{
+	int		i;
+	int		ret;
+
+	ret = 0;
+	i = 0;
+	while (i < size) {
+		if (field[i] != 0) {
+			if (i / n - realPos[field[i]].i != 0) {
+				ret++;
+			}
+			if (i % n - realPos[field[i]].j != 0) {
+				ret++;
+			}
+		}
+		i++;
+	}
+	return ret;
+}
+
+int		getMisplacedTiles(int *field)
+{
+	int		i;
+	int		ret;
+
+	i = 0;
+	ret = 0;
+	while (i < size) {
+		if (field[i] == 0) {
+			if (i != size - 1) {
+				ret++;
+			}
+		} else if (i / n != realPos[field[i]].i || i % n != realPos[field[i]].j) {
+			ret++;
+		}
+		i++;
+	}
+	return ret;
+}
+
 int		getH(int *field)
 {
 	char	*heu;
@@ -332,7 +364,12 @@ int		getH(int *field)
 			h += getLinearConflictMine(field);
 		} else if (strcmp(heu, "patternDatabase") == 0) {
 			h += getPatternDatabase(field);
-			// h += getManhattan(field) + getLinearConflictMine(field);
+		} else if (strcmp(heu, "tilesOut") == 0) {
+			h += getTilesOut(field);
+		} else if (strcmp(heu, "misplacedTiles") == 0) {
+			h += getMisplacedTiles(field);
+		} else if (strcmp(heu, "euclideanDistance") == 0) {
+			h += getManhattan(field);
 		}
 		heu = strtok(NULL, "+");
 	}
