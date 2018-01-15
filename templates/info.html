@@ -50,7 +50,7 @@
 	For subsequent calculations we will use this <span style="font-weight: bold;">example</span>:
 	<br>
 	<img src="../static/img/linear.png" class="images">
-	<h4 class="h_main">Manhattan distance</h4>
+	<h4 class="h_main"><a href="https://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan distance</a></h4>
 	<p>
 		Manhattan distance is one of the most powerful heuristics. It is the sum of the moves necessary to place each tile at its goal place <span style="font-weight: bold;">except the blank tile</span>.
 		<br>
@@ -78,9 +78,35 @@
 		<br>
 		General evaluation of this field: H = 10(manhattan) + 2 = 12.
 	</p>
-	<h4 class="h_main">Linear Conflict Mine</h4>
+	<h4 class="h_main">Linear Conflict Mine (not admissible!)</h4>
 	<p>
-		While working on this project, I accidentally made a mistake while writing a linear conflict and did not take into account the condition that goal positions of tiles must be in the same row or column. But when I noticed and corrected the error, I realized that the 15-puzzles began to be solved more slowly (noticeably), although for a smaller number of moves. So I de
+		While working on this project, I accidentally made a mistake while writing a linear conflict and did not take into account the condition that goal positions of tiles must be in the same row or column. But when I noticed and corrected the error, I realized that the 15-puzzles began to be solved more slowly (noticeably), although for a smaller number of moves. So I decided to leave this heuristic as an example not admissible.
+		<br>
+		So the heuristic works like this: two tiles in a conflict if the one that is before (i or j is closer to 0) is greater than the second.
+		<br>
+		As example we have tiles 5 (0,1) and 2(0,2) => 5[j] < 2[j] and 5 > 2. General evaluation is 12.
+	</p>
+	<h4 class="h_main">Tiles out of row/column</h4>
+	<p>
+		This is a simplified version of the Manhattan distance. Instead of counting the distance of tile to the final position, we for every tile incrementing h if tile is not in his column or line.
+		<br>
+		In our example we have h = 8.
+	</p>
+	<h4 class="h_main">Pattern Database</h4>
+	<p>
+		The fastest and cheatest heuristic. The bottom line is that we divide the field into different parts that do not intersect each other. Then, for each part, we do not take into account all the other tiles and using Breadth First Search, we find all possible combinations of their placement on the field ((n^2)! / (n^2 - pattern_len)!) with a cost estimate. In example below all combo = (16! / (16 - 5)! = 524 160.
+		<br>
+		<img src="../static/img/pattern.png" class="images">
+		<br>
+		In this example (which I used in the code), we divide the field into three equal parts - [[1, 2, 3, 5, 6], [9, 10, 13, 14, 15], [4, 7, 8, 11, 12]]. The most popular databases is this, 6-6-3 and 7-8. The 7-8 combination is the fastest but it will take a lot of memory.
+		<br>
+		<img src="../static/img/one_pattern.png" class="images">
+		<br>
+		So we start from the initial state and begin to change the empty tile with all possible. When replacing an empty tile with one of the tiles of the pattern, we add 1 to (<span class="formula">G</span>), otherwise we do not add anything. For example above, the cost g will be 1. Then we hash the current state of the field and use it as a key for our database, in this key we save the cost(1).
+		<br>
+		Hash example: if tile is '-1' or '0' we add '0' to our hash, else we add tile number. Then you could save your databases in files which you will use later.
+		<br>
+		Then, during solving the puzzle, for each pattern we hash our field (for each pattern separately) and summarize their values.
 	</p>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
