@@ -68,6 +68,6 @@ def parse_file():
 			i += 1
 	return json.dumps({'size': n, 'field': initial_field})
 
-if __name__ == '__main__':
-	system("make toPython -C c/")
-	app.run(debug=True)
+# if __name__ == '__main__':
+system("make toPython -C c/")
+app.run(debug=True)
