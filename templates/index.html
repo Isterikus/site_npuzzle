@@ -13,24 +13,24 @@
 <body>
 	<h1 class="h_main">Sliding puzzle</h1>
 <p class="infoText">
-This application finds the solution to solve a 8 or 15-puzzle.
+This application finds the solution to solve a 8 or 15-puzzle. You can read more <a href="info">here</a>.
 <br>
 Code is written on two languages: Python and C.
 <br>
 Different algorithms are implemented :
-<a href="bfs">Breadth First Search</a>,
-<a href="aStar">A*</a> or
-<a href="idaStar">Iterative Deepening A* (IDA*)</a>.
-A* and IDA* algorithms use heuristic function(s) to find the solution.
+<a href="https://en.wikipedia.org/wiki/Breadth-first_search" target="_blank">Breadth First Search</a>,
+<a href="https://en.wikipedia.org/wiki/A*_search_algorithm" target="_blank">A*</a> or
+<a href="https://en.wikipedia.org/wiki/Iterative_deepening_A*" target="_blank">Iterative Deepening A* (IDA*)</a>.
+A* and IDA* algorithms use <a href="https://en.wikipedia.org/wiki/Heuristic_(computer_science)" target="_blank">heuristic</a> function(s) to find the solution.
 <br>
 Seven heuristic functions are proposed :
-<a href="manhattan">Manhattan Distance</a>,
-<a href="linear">Linear Conflict</a>,
-<a href="linear2">Linear Conflict Mine</a>,
-<a href="patternDatabase">Pattern Database</a>,
-<a href="tilesOut">Tiles out of row/column</a>,
-<a href="misplacedTiles">Misplaced Tiles</a>,
-<a href="euqlidian">Euqlidian distance</a>.
+Manhattan Distance,
+Linear Conflict,
+Linear Conflict Mine,
+Pattern Database,
+Tiles out of row/column,
+Misplaced Tiles,
+Euqlidian distance.
 <br>
 You can use, combine and compare these algorithms and heuristics.
 <br>
@@ -557,6 +557,7 @@ $('#random').click(function () {
 });
 
 function readField() {
+	var size = $('#size').val();
 	var field = "";
 	for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
@@ -571,6 +572,7 @@ function readField() {
 			}
 		}
 	}
+	return field;
 }
 
 function test() {
@@ -591,10 +593,12 @@ function test() {
 
 		var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian, misplacedTiles];
 		if (!validateSolve(size, algorithmType, heuristics)) {
+			$('#loader').hide();
 			return;
 		}
 		field = readField();
 		if (!validatePath(field.split(','))) {
+			$('#loader').hide();
 			return;
 		}
 		// showWait();

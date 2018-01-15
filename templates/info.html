@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+	<title>Info</title>
+</head>
+<body class="info_body">
+	<h1 class="h_main">N puzzle</h1>
+	<p>
+		The n-puzzle is a sliding puzzle that consists of a frame of numbered square tiles in random order with one tile missing. The object of the puzzle is to place the tiles in order by making sliding moves that use the empty space.
+	</p>
+	<div class="col-sm-6">
+		<img src="../static/img/not_solved.png" class="images">
+	</div>
+	<div class="col-sm-6">
+		<img src="../static/img/solved.png" class="images">
+	</div>
+	<h3 class="h_main">Algorithms</h3>
+	<p>
+		All presented alogorithms work with <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)" target="_blank">graph</a> search.
+		Each graph represents a new state of the field as 2D array with (i,j) combination:
+		<br>
+		(0,0) (0,1) (0,2)
+		<br>
+		(1,0) (1,1) (1,2)
+		<br>
+		(2,0) (2,1) (2,2)
+		<br>
+		A* and IDA* algorithms use heuristic function to estimate the field. Evaluation (heuristics) is necessary to speed up the search for a solution.
+	</p>
+	<img src="../static/img/graph.png" style="width: 400px;">
+	<h3 class="h_main">Heuristics</h3>
+	<h4>Manhattan distance</h4>
+	<p>
+		Manhattan distance is one of the most powerful heuristics. It is the sum of the moves necessary to place each cell at its "right" place.
+	</p>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>

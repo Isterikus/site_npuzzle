@@ -16,10 +16,10 @@ CORS(app)
 def main():
 	return render_template('index.html')
 
-@app.route('/bfs')
-@app.route('/bfs.html')
+@app.route('/info')
+@app.route('/info.html')
 def info():
-	return render_template('bfs.html')
+	return render_template('info.html')
 
 @app.route('/rand', methods=['POST'])
 def rand():
