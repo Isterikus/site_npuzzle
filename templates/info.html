@@ -8,7 +8,7 @@
 	<title>Info</title>
 </head>
 <body class="info_body">
-	<h1 class="h_main">N puzzle</h1>
+	<h1 class="h_main">N puzzle (<a href="/">main page</a>)</h1>
 	<p>
 		The n-puzzle is a sliding puzzle that consists of a frame of numbered square tiles in random order with one tile missing. The object of the puzzle is to place the tiles in order by making sliding moves that use the empty space.
 		<br>
@@ -35,6 +35,8 @@
 		(2,0) (2,1) (2,2)
 		<br>
 		A* and IDA* algorithms use heuristic function to estimate the current field. They add this value (<span class="formula">H</span>) to the number of moves already made (<span class="formula">G</span>) and get final score (<span class="formula">F</span>). Evaluation (heuristics) is necessary to speed up the search for a solution.
+		<br>
+		You can read about this alorithms here: <a href="https://en.wikipedia.org/wiki/Breadth-first_search" target="_blank">Breadth First Search</a>, <a href="https://en.wikipedia.org/wiki/A*_search_algorithm" target="_blank">A*</a>, <a href="https://en.wikipedia.org/wiki/Iterative_deepening_A*" target="_blank">IDA*</a>.
 	</p>
 	<h3 class="h_main">Heuristics</h3>
 	<p>
@@ -50,7 +52,7 @@
 	For subsequent calculations we will use this <span style="font-weight: bold;">example</span>:
 	<br>
 	<img src="../static/img/linear.png" class="images">
-	<h4 class="h_main"><a href="https://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan distance</a></h4>
+	<h4 class="h_main"><a href="https://en.wikipedia.org/wiki/Taxicab_geometry" target="_blank">Manhattan distance</a></h4>
 	<p>
 		Manhattan distance is one of the most powerful heuristics. It is the sum of the moves necessary to place each tile at its goal place <span style="font-weight: bold;">except the blank tile</span>.
 		<br>
@@ -88,9 +90,25 @@
 	</p>
 	<h4 class="h_main">Tiles out of row/column</h4>
 	<p>
-		This is a simplified version of the Manhattan distance. Instead of counting the distance of tile to the final position, we for every tile incrementing h if tile is not in his column or line.
+		This is a simplified version of the Manhattan distance. Instead of counting the distance of tile to the final position, we for every tile incrementing h if tile is not in his goal column or line.
 		<br>
 		In our example we have h = 8.
+	</p>
+	<h4 class="h_main">Misplaced Tiles</h4>
+	<p>
+		The most simple heuristic, you need to count the number of tiles that are not at their final position.
+		<br>
+		In our example we have h = 8.
+	</p>
+	<h4 class="h_main"><a href="https://en.wikipedia.org/wiki/Euclidean_distance" target="_blank">Euqlidian distance</a></h4>
+	<p>
+		Why not?:) The distance to which we are all familiar.
+		<br>
+			<span class="formula">
+				H += sqrt( (now[ i ] - goal[ i ])^2 + (now[ j ] - goal[ j ])^2 )
+			</span>
+		<br>
+		In our example we have h = 8.8284.
 	</p>
 	<h4 class="h_main">Pattern Database</h4>
 	<p>
