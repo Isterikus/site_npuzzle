@@ -1,5 +1,4 @@
 # from subprocess import call
-from time import time
 from ctypes import *
 from random import randint
 
@@ -7,6 +6,23 @@ from .Algorithms import *
 from .generator import *
 from .Node import *
 
+
+import multiprocessing.pool
+import functools
+
+def timeout(max_timeout):
+	"""Timeout decorator, parameter in seconds."""
+	def timeout_decorator(item):
+		"""Wrap the original function."""
+		@functools.wraps(item)
+		def func_wrapper(*args, **kwargs):
+			"""Closure for function."""
+			pool = multiprocessing.pool.ThreadPool(processes=1)
+			async_result = pool.apply_async(item, args, kwargs)
+			# raises a TimeoutError if execution exceeds max_timeout
+			return async_result.get(max_timeout)
+		return func_wrapper
+	return timeout_decorator
 
 def doRand(size):
 	bem = [i + 1 for i in range(pow(size, 2))]
@@ -56,6 +72,7 @@ def parse_solve(node):
 		node = node.parent
 	return solution[::-1]
 
+@timeout(60.0)
 def from_site(size, path, algo, heuristics):
 	# path = [0, 10, 13, 15, 2, 3, 4, 8, 14, 7, 5, 6, 11, 1, 9, 12] - 48
 	# path = [0, 6, 14, 3, 9, 5, 13, 7, 12, 2, 1, 8, 11, 10, 15, 4] - 46
@@ -73,16 +90,15 @@ def from_site(size, path, algo, heuristics):
 	to_c = c_char_p(to_c.encode('utf-8'))
 	algo_c = c_char_p(algo.encode('utf-8'))
 	heuristics_c = c_char_p(heuristics.encode('utf-8'))
-	start_c = time()
 	c_module.python.restype = c_float
 	c_time2 = c_module.python(size, to_c, algo_c, heuristics_c)
-	c_time = time() - start_c
 	# print("C TIME = ", c_time)
 	# print("C TIME2 = ", c_time2)
 	# call(["./a.out", str(size), to_c])
 	# print("TIME = ", rez['time'])
 	return {'c_time': c_time2 / 1000.0, 'python_time': rez['time'], 'solution': solution}
 	# return {'time': rez['time']}
+
 
 if __name__ == "__main__":
 	size = 4

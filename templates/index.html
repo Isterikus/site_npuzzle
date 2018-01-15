@@ -12,19 +12,25 @@
 
 <body>
 	<h1 class="h_main">Sliding puzzle</h1>
+
 	<div id="loader" style="display: none;"></div>
 	<div class="col-sm-12 col-md-8">
 		<div id="puzzle" class="puzzleTable">
 		</div>
 		<div id="actionsBar">
-			<label class="btn btn-info actionButtons" for="file_load" id="labelFileLoad">
-				<input id="file_load" type="file" style="display:none;">
-				Load file
-			</label>
-			<button class="btn btn-warning actionButtons" id="custom">Custom input</button>
-			<button class="btn btn-primary actionButtons" id="random">Make it random!</button>
-			<button class="btn btn-success actionButtons" id="solve">Solve!</button>
-			<button class="btn btn-danger actionButtons" id="play">Play the result!</button>
+			<div class="col-sm-12 col-md-6 srav">
+				<label class="btn btn-info actionButtons actOne" for="file_load" id="labelFileLoad">
+					<input id="file_load" type="file" style="display:none;">
+					Load file
+				</label>
+				<button class="btn actionButtons actOne" id="save">Save to file</button>
+				<button class="btn btn-warning actionButtons actOne" id="custom">Custom input</button>
+			</div>
+			<div class="col-sm-12 col-md-6 srav">
+				<button class="btn btn-primary actionButtons" id="random">Make it random!</button>
+				<button class="btn btn-success actionButtons" id="solve">Solve!</button>
+				<button class="btn btn-danger actionButtons" id="play">Play the result!</button>
+			</div>
 		</div>
 	</div>
 	<div class="col-sm-12 col-md-4">
@@ -119,6 +125,7 @@ var heuristicTypes = [{'val': 'manhattan', 'text': 'Manhattan distance'}];
 var solution = "";
 var tile_size = 61;
 var field_static = 5;
+var reque;
 
 $('#manhattan').prop('checked', true);
 $('#linear').prop('checked', true);
@@ -186,17 +193,17 @@ function setHeuristicTypes() {
 }
 
 function request(page, dataSend) {
-	$.ajax({
+	var req = $.ajax({
 		async:false,
 		type: 'POST',
 		url: page,
 		data: dataSend,
+		beforeSend: function (jqXHR, settings) {
+			reque = jqXHR;
+		},
 		success: function (translated) {
 			ret = $.parseJSON(translated);
 			// return translated;
-		},
-		complete: function () {
-			$('#loader').hide();
 		},
 	});
 	// hideWait();
@@ -404,6 +411,7 @@ function freeInfo() {
 	$("#timePython").html('');
 	$("#timeC").html('');
 	$('#moves').html('');
+	$('#way').html('');
 	solution = "";
 }
 
@@ -493,9 +501,14 @@ $('#size').change(function () {
 	solution = "";
 	if ($(this).val() == 4) {
 		$('#patternDatabase').attr("disabled", false);
+		$('#patternDatabase').prop('checked', true);
+		$('#manhattan').prop('checked', false);
+		$('#linear').prop('checked', false);
 	} else {
 		$('#patternDatabase').prop('checked', false);
 		$('#patternDatabase').attr("disabled", true);
+		$('#manhattan').prop('checked', true);
+		$('#linear').prop('checked', true);
 	}
 	setPuzzle();
 });
@@ -519,10 +532,11 @@ $('#random').click(function () {
 	// $('#puzzle').css('height', $('#puzzle').css('width'));
 });
 
-$('#solve').click(function () {
+function test() {
 	$('#loader').show();
 	$('#loader').css('left', window.innerWidth / 2 - 60);
 	$('#loader').css('top', window.innerHeight / 2 - 60);
+	// freeInfo();
 	setTimeout(function() {
 		var size = Number($('#size').val());
 		var algorithmType = $('#algorithmType').val();
@@ -535,7 +549,6 @@ $('#solve').click(function () {
 		var misplacedTiles = ($('#misplacedTiles').prop('checked')) ? 1 : 0;
 
 		var heuristics = [manhattan, linear, linear2, patternDatabase, tilesOut, euqlidian, misplacedTiles];
-		freeInfo();
 		if (!validateSolve(size, algorithmType, heuristics)) {
 			return;
 		}
@@ -579,41 +592,76 @@ $('#solve').click(function () {
 		}
 		heur = heur.slice(0, -1);
 		data = {size: size, field: field, algo: algorithmType, heuristics: heur};
-		ret = request('solve', data);
-		$("#timePython").html(ret['python_time']);
-		$("#timeC").html(ret['c_time']);
-		$('#moves').html(ret['solution'].length);
-		solution = ret['solution'];
-		var str = "";
-		var fie = field.split(',');
-		// var all_cells = Math.pow(size, 2);
-		var z = {'i': 0, 'j': 0};
-		for (var i = 0; i < solution.length; i++) {
-			move = solution.charAt(i);
-			zero = findZero(fie);
-			console.log("ZERO = ", zero);
-			z['i'] = parseInt(zero / size);
-			z['j'] = parseInt(zero % size);
-			if (move == 'l') {
-				str += "right(" + (z['i']) + "," + (z['j'] - 1) + ") | ";
-				fie[zero] = fie[zero - 1];
-				fie[zero - 1] = 0;
-			} else if (move == 'r') {
-				str += "left(" + (z['i']) + "," + (z['j'] + 1) + ") | ";
-				fie[zero] = fie[zero + 1];
-				fie[zero + 1] = 0;
-			} else if (move == 't') {
-				str += "bottom(" + (z['i'] - 1) + "," + (z['j']) + ") | ";
-				fie[zero] = fie[zero - size];
-				fie[zero - size] = 0;
-			} else if (move == 'b') {
-				str += "top(" + (z['i'] + 1) + "," + (z['j']) + ") | ";
-				fie[zero] = fie[zero + size];
-				fie[zero + size] = 0;
-			}
-		}
-		$('#way').html(str);
+		// ret = request('solve', data);
+		var req = $.ajax({
+			async:false,
+			type: 'POST',
+			url: 'solve',
+			data: data,
+			beforeSend: function (jqXHR, settings) {
+				reque = jqXHR;
+			},
+			success: function (translated) {
+				ret = $.parseJSON(translated);
+				// return translated;
+				$("#timePython").html(ret['python_time']);
+				$("#timeC").html(ret['c_time']);
+				$('#moves').html(ret['solution'].length);
+				solution = ret['solution'];
+				var str = "";
+				var fie = field.split(',');
+				// var all_cells = Math.pow(size, 2);
+				var z = {'i': 0, 'j': 0};
+				for (var i = 0; i < solution.length; i++) {
+					move = solution.charAt(i);
+					zero = findZero(fie);
+					console.log("ZERO = ", zero);
+					z['i'] = parseInt(zero / size);
+					z['j'] = parseInt(zero % size);
+					if (move == 'l') {
+						str += "right(" + (z['i']) + "," + (z['j'] - 1) + ") | ";
+						fie[zero] = fie[zero - 1];
+						fie[zero - 1] = 0;
+					} else if (move == 'r') {
+						str += "left(" + (z['i']) + "," + (z['j'] + 1) + ") | ";
+						fie[zero] = fie[zero + 1];
+						fie[zero + 1] = 0;
+					} else if (move == 't') {
+						str += "bottom(" + (z['i'] - 1) + "," + (z['j']) + ") | ";
+						fie[zero] = fie[zero - size];
+						fie[zero - size] = 0;
+					} else if (move == 'b') {
+						str += "top(" + (z['i'] + 1) + "," + (z['j']) + ") | ";
+						fie[zero] = fie[zero + size];
+						fie[zero + size] = 0;
+					}
+				}
+				$('#way').html(str);
+			},
+			error: function () {
+				$('#loader').hide();
+				alert("Can't solve puzzle during 60 sec, sorry :(");
+			},
+			complete: function () {
+				$('#loader').hide();
+			},
+		});
 	}, 0);
+}
+
+$('#stop').click(function() {
+	console.log("STOPPING");
+	reque.abort();
+});
+
+$('#solve').click(function () {
+	test();
+});
+
+$('#save').click(function() {
+	var blob = new Blob(["efwwedw"], {type: "text/plain;charset=utf-8"});
+	filename = "srav";
+	saveAs(blob, filename+".txt");
 });
 
 $(document).ready(function () {
@@ -622,6 +670,9 @@ $(document).ready(function () {
 	setAlgoTypes();
 	// setHeuristicTypes();
 });
+
+var saveAs=saveAs||function(e){"use strict";if(!("undefined"==typeof e||"undefined"!=typeof navigator&&/MSIE [1-9]\./.test(navigator.userAgent))){var t=e.document,n=function(){return e.URL||e.webkitURL||e},o=t.createElementNS("http://www.w3.org/1999/xhtml","a"),r="download"in o,a=function(e){var t=new MouseEvent("click");e.dispatchEvent(t)},i=/constructor/i.test(e.HTMLElement)||e.safari,d=/CriOS\/[\d]+/.test(navigator.userAgent),f=function(t){(e.setImmediate||e.setTimeout)(function(){throw t},0)},s="application/octet-stream",u=4e4,c=function(e){var t=function(){"string"==typeof e?n().revokeObjectURL(e):e.remove()};setTimeout(t,u)},l=function(e,t,n){t=[].concat(t);for(var o=t.length;o--;){var r=e["on"+t[o]];if("function"==typeof r)try{r.call(e,n||e)}catch(a){f(a)}}},v=function(e){return/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(e.type)?new Blob([String.fromCharCode(65279),e],{type:e.type}):e},p=function(t,f,u){u||(t=v(t));var p,w=this,m=t.type,y=m===s,S=function(){l(w,"writestart progress write writeend".split(" "))},h=function(){if((d||y&&i)&&e.FileReader){var o=new FileReader;return o.onloadend=function(){var t=d?o.result:o.result.replace(/^data:[^;]*;/,"data:attachment/file;"),n=e.open(t,"_blank");n||(e.location.href=t),t=void 0,w.readyState=w.DONE,S()},o.readAsDataURL(t),void(w.readyState=w.INIT)}if(p||(p=n().createObjectURL(t)),y)e.location.href=p;else{var r=e.open(p,"_blank");r||(e.location.href=p)}w.readyState=w.DONE,S(),c(p)};return w.readyState=w.INIT,r?(p=n().createObjectURL(t),void setTimeout(function(){o.href=p,o.download=f,a(o),S(),c(p),w.readyState=w.DONE})):void h()},w=p.prototype,m=function(e,t,n){return new p(e,t||e.name||"download",n)};return"undefined"!=typeof navigator&&navigator.msSaveOrOpenBlob?function(e,t,n){return t=t||e.name||"download",n||(e=v(e)),navigator.msSaveOrOpenBlob(e,t)}:(w.abort=function(){},w.readyState=w.INIT=0,w.WRITING=1,w.DONE=2,w.error=w.onwritestart=w.onprogress=w.onwrite=w.onabort=w.onerror=w.onwriteend=null,m)}}("undefined"!=typeof self&&self||"undefined"!=typeof window&&window||this);"undefined"!=typeof module&&module.exports?module.exports.saveAs=saveAs:"undefined"!=typeof define&&null!==define&&null!==define.amd&&define("FileSaver.js",function(){return saveAs});
+
 	</script>
 
 	<!-- <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script> -->

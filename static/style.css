@@ -76,6 +76,23 @@ body {
 	color: rgb(80, 80, 80);
 }
 
+.srav {
+	padding: 0;
+}
+
+#save {
+	background-color: #ff00ff;
+	color: white;
+}
+
+#save:hover {
+	background-color: #ee00ee;
+}
+
+.actOne {
+	float: right;
+}
+
 #loader {
 	z-index: 1000;
 	position: absolute;
