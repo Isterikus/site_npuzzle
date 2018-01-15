@@ -107,6 +107,12 @@ body {
 	animation: spin 2s linear infinite;
 }
 
+.infoText {
+	padding-left: 30px;
+	padding-right: 30px;
+	font-size: 16px;
+}
+
 /* Safari */
 @-webkit-keyframes spin {
 	0% { -webkit-transform: rotate(0deg); }

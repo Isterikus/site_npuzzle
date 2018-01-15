@@ -16,6 +16,11 @@ CORS(app)
 def main():
 	return render_template('index.html')
 
+@app.route('/bfs')
+@app.route('/bfs.html')
+def info():
+	return render_template('bfs.html')
+
 @app.route('/rand', methods=['POST'])
 def rand():
 	print(request.values)
