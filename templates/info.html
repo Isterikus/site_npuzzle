@@ -11,17 +11,22 @@
 	<h1 class="h_main">N puzzle</h1>
 	<p>
 		The n-puzzle is a sliding puzzle that consists of a frame of numbered square tiles in random order with one tile missing. The object of the puzzle is to place the tiles in order by making sliding moves that use the empty space.
+		<br>
+		<div class="col-sm-6">
+			<img src="../static/img/not_solved.png" class="images">
+		</div>
+		<div class="col-sm-6">
+			<img src="../static/img/solved.png" class="images">
+		</div>
+		Half of the possible combinations (<span class="formula">n^2 / 2</span>) of tiles on the field are not solvable.
 	</p>
-	<div class="col-sm-6">
-		<img src="../static/img/not_solved.png" class="images">
-	</div>
-	<div class="col-sm-6">
-		<img src="../static/img/solved.png" class="images">
-	</div>
 	<h3 class="h_main">Algorithms</h3>
 	<p>
 		All presented alogorithms work with <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)" target="_blank">graph</a> search.
-		Each graph represents a new state of the field as 2D array with (i,j) combination:
+		<br>
+		<img src="../static/img/graph.png" style="width: 400px;">
+		<br>
+		Each vertex represents a new state of the field as 2D array with <span class="formula">(i,j)</span> combination:
 		<br>
 		(0,0) (0,1) (0,2)
 		<br>
@@ -29,13 +34,53 @@
 		<br>
 		(2,0) (2,1) (2,2)
 		<br>
-		A* and IDA* algorithms use heuristic function to estimate the field. Evaluation (heuristics) is necessary to speed up the search for a solution.
+		A* and IDA* algorithms use heuristic function to estimate the current field. They add this value (<span class="formula">H</span>) to the number of moves already made (<span class="formula">G</span>) and get final score (<span class="formula">F</span>). Evaluation (heuristics) is necessary to speed up the search for a solution.
 	</p>
-	<img src="../static/img/graph.png" style="width: 400px;">
 	<h3 class="h_main">Heuristics</h3>
-	<h4>Manhattan distance</h4>
 	<p>
-		Manhattan distance is one of the most powerful heuristics. It is the sum of the moves necessary to place each cell at its "right" place.
+		Heuristics (<span class="formula">H</span>) is a function that takes the current state of the field and estimates its cost (moves needed to solve it) compared to the solution state.
+		Heuristics are divided into two types:
+		<br>
+		<span style="font-weight: bold;">Admissible</span> - find the most optimal solution (for a minimum number of moves);
+		<br>
+		<span style="font-weight: bold;">Not admissible</span> - find not the optimal solution, but can speed up the search.
+		<br>
+		To become admissible heuristic must return value not bigger then needed to solve the puzzle.
+	</p>
+	For subsequent calculations we will use this <span style="font-weight: bold;">example</span>:
+	<br>
+	<img src="../static/img/linear.png" class="images">
+	<h4 class="h_main">Manhattan distance</h4>
+	<p>
+		Manhattan distance is one of the most powerful heuristics. It is the sum of the moves necessary to place each tile at its goal place <span style="font-weight: bold;">except the blank tile</span>.
+		<br>
+		For each tile we have (now - where the tile is now, goal - where the tile should be):
+		<br>
+		<span class="formula">
+			H += abs(now[ i ] - goal[ i ]) + abs(now[ j ] - goal[ j ])
+		</span>
+		<br>
+		<br>
+		Let's count distance for tile 3 in the example:
+		<br>
+		Tile 3 is on position (2,0) and it's goal position is (0,2), so we have: h = abs(2 - 0) + abs(0 - 2) = 4.
+		<br>
+		General evaluation of this field: H = 10.
+	</p>
+	<h4 class="h_main">Linear Conflict</h4>
+	<p>
+		This is an auxiliary heuristic for the Manhattan distance. Two tiles ‘a’ and ‘b’ are in a linear conflict if they are in the same row or column, also their goal positions are in the same row or column and the goal position of one of the tiles is blocked by the other tile in that row(column).
+		<br>
+		As we know that heuristic value is the value that gives a theoretical least value of the number of moves required to solve the problem we can see that one linear conflict causes two moves to be added to the final heuristic value(h) as one tile will have to move aside in order to make way for the tile that has the goal state behind the moved tile and then back resulting in 2 moves which retains the admissibility of the heuristic.
+		<br>
+		<br>
+		In the example we see that tile 4 and tile 1 are in a linear conflict since we see that tile 4 is in the path of the goal position of tile 1 in the same column.
+		<br>
+		General evaluation of this field: H = 10(manhattan) + 2 = 12.
+	</p>
+	<h4 class="h_main">Linear Conflict Mine</h4>
+	<p>
+		While working on this project, I accidentally made a mistake while writing a linear conflict and did not take into account the condition that goal positions of tiles must be in the same row or column. But when I noticed and corrected the error, I realized that the 15-puzzles began to be solved more slowly (noticeably), although for a smaller number of moves. So I de
 	</p>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
