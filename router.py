@@ -73,6 +73,7 @@ def parse_file():
 # system("make toPython -C c/")
 if __name__ == "__main__":
 	if _platform == "linux" or _platform == "linux2":
+		print("RUN THIS")
 		system("gcc -shared -Wl,-soname,adder -o adder.so -fPIC add.c")
 	elif _platform == "darwin":
 		system("gcc -shared -Wl,-install_name,adder.so -o adder.so -fPIC c/main.c c/libft/libftprintf.a")
