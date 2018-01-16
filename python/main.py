@@ -88,7 +88,7 @@ def from_site(size, path, algo, heuristics):
 	to_c = to_c[1:]
 
 	# print("to c = ", to_c)
-	c_module = CDLL('./adder.so')
+	c_module = CDLL('./hello.so')
 	to_c = c_char_p(to_c.encode('utf-8'))
 	algo_c = c_char_p(algo.encode('utf-8'))
 	heuristics_c = c_char_p(heuristics.encode('utf-8'))
