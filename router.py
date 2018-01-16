@@ -71,4 +71,5 @@ def parse_file():
 # if __name__ == '__main__':
 # system("make toPython -C c/")
 if __name__ == "__main__":
+	system("gcc -o adder.so -shared -fPIC c/main.c c/libft/libftprintf.a")
 	app.run()
