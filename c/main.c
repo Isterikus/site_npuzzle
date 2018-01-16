@@ -855,9 +855,17 @@ float	python(int sz, char *field, char *algo, char *heurs)
 	return (stop.tv_sec - start.tv_sec) * 1000.0f + (stop.tv_usec - start.tv_usec) / 1000.0f;
 }
 
-int		main(int argc, char const *argv[])
+int		main(int argc, char *argv[])
 {
-	python(4, "9,15,10,13,4,8,3,5,11,14,0,6,1,2,7,12", "idaStar", "patternDatabase");
+	if (argc != 5) {
+		printf("Bad number of arguments\n");
+		return 0;
+	}
+	if (argv[1][0] == '3') {
+		python(3, argv[2], argv[3], argv[4]);
+	} else {
+		python(4, argv[2], argv[3], argv[4]);
+	}
 	// int		*initial_field;
 	// int		i;
 	// int		j;

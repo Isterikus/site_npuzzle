@@ -2,6 +2,7 @@
 from ctypes import *
 from ctypes.util import find_library
 from random import randint
+from os import system
 
 from .Algorithms import *
 from .generator import *

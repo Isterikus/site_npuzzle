@@ -2,6 +2,7 @@ import os
 from flask import Flask, jsonify, request, url_for, render_template
 from flask_cors import CORS
 import json
+from sys import platform as _platform
 from os import system
 
 # from python.generator import *
@@ -71,5 +72,9 @@ def parse_file():
 # if __name__ == '__main__':
 # system("make toPython -C c/")
 if __name__ == "__main__":
-	system("gcc -o adder.so -shared -fPIC c/main.c c/libft/libftprintf.a")
+	if _platform == "linux" or _platform == "linux2":
+		system("gcc -shared -Wl,-soname,adder -o adder.so -fPIC add.c")
+	elif _platform == "darwin":
+		system("gcc -shared -Wl,-install_name,adder.so -o adder.so -fPIC c/main.c c/libft/libftprintf.a")
+	# gcc - shared - Wl, -install_name, adder.so - o adder.so - fPIC main.c libft / libftprintf.a
 	app.run()
