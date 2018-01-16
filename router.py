@@ -70,5 +70,5 @@ def parse_file():
 
 # if __name__ == '__main__':
 # system("make toPython -C c/")
-port = int(os.environ.get('PORT', 5000))
-app.run(host='0.0.0.0', port=port, debug=True)
+if __name__ == "__main__":
+	app.run()
