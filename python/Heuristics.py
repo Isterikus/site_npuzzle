@@ -8,9 +8,6 @@ class Heuristics():
 		self.all_cells = pow(size, 2)
 		self.real_positions = [{} for i in range(self.all_cells)]
 		self.realPositions()
-		# self.patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]]
-		# self.patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]]
-		# self.patterns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]]  # 5-5-5 1
 		self.patterns = [[1, 2, 3, 5, 6], [4, 7, 8, 11, 12], [9, 10, 13, 14, 15]]  # 5-5-5 2
 		self.databases = []
 		for i in range(len(self.patterns)):
@@ -67,10 +64,7 @@ class Heuristics():
 	def patternDatabase(self, node):
 		ret = 0
 		for i in range(len(self.patterns)):
-			# if node.code(self.patterns[i]) in self.databases:
 			ret += self.databases[i][node.code(self.patterns[i])]
-			# else:
-			# 	return self.manhattan(node.field) + self.linear2(node.field)
 		return ret
 
 	def tilesOut(self, field):
@@ -119,11 +113,3 @@ class Heuristics():
 			elif heuristic == "euclideanDistance":
 				h += self.euclideanDistance(node.field)
 		return h
-
-# field = [0,10,13,15,2,3,4,8,14,7,5,6,11,1,9,12]
-# field = [3,7,2,0,1,5,6,4,8]
-# # # field = [7,6,2,5,0,1,4,8,3]
-# # # field = [4,2,5,1,0,6,3,8,7]
-# heu = Heuristics("manhattan", 3)
-# h = heu.getH(field)
-# print(h)

@@ -56,11 +56,6 @@ class Node:
 			else:
 				code += str(val)
 		return code
-		# code = ""
-		# for val in pattern:
-		# 	pos = self.find(val)
-		# 	code += str(pos['i']) + str(pos['j'])
-		# return code
 
 	def getChildrens(self):
 		pos = self.getZero()

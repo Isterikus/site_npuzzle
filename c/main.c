@@ -1,4 +1,5 @@
 #include "main.h"
+// gcc -o adder.so -shared -fPIC main.c libft/libftprintf.a
 
 int			*left_range;
 int			*right_range;
@@ -271,7 +272,7 @@ int		find_db(t_db *db, char *hash)
 
 	i = 0;
 	temp = db;
-	while (i < strlen(hash)) {
+	while (i < (int)strlen(hash)) {
 		temp = temp->next[hash[i] - 48];
 		i++;
 	}
@@ -762,7 +763,7 @@ void	bfs(int *initial_field)
 	closed->state = NULL;
 	opened->next = NULL;
 	closed->next = NULL;
-	print_field(initial);
+	// print_field(initial);
 	while(opened) {
 		current = popleft(&opened);
 		if (ansver(current->field)) {
@@ -786,9 +787,9 @@ void	bfs(int *initial_field)
 			}
 			if (not_in(closed, succ)) {
 				succ->parent = current;
-				if (not_in(opened, succ)) {
-					append(&opened, succ);
-				}
+				// if (not_in(opened, succ)) {
+				append(&opened, succ);
+				// }
 			}
 			i++;
 		}
@@ -853,45 +854,4 @@ float	python(int sz, char *field, char *algo, char *heurs)
 	free(top_range);
 	free(bottom_range);
 	return (stop.tv_sec - start.tv_sec) * 1000.0f + (stop.tv_usec - start.tv_usec) / 1000.0f;
-}
-
-int		main(int argc, char *argv[])
-{
-	if (argc != 5) {
-		printf("Bad number of arguments\n");
-		return 0;
-	}
-	if (argv[1][0] == '3') {
-		python(3, argv[2], argv[3], argv[4]);
-	} else {
-		python(4, argv[2], argv[3], argv[4]);
-	}
-	// int		*initial_field;
-	// int		i;
-	// int		j;
-
-	// if (argc != 3)
-	// 	return 0;
-	// printf("START C\n");
-	// n = atoi(argv[1]);
-	// size = n * n;
-	// initial_field = (int *)malloc(sizeof(int) * size);
-	// i = 0;
-	// j = 0;
-	// while (argv[2][i])
-	// {
-	// 	initial_field[j] = 0;
-	// 	while (argv[2][i] && argv[2][i] != ',')
-	// 		initial_field[j] = initial_field[j] * 10 + argv[2][i++] - 48;
-	// 	if (argv[2][i])
-	// 		i++;
-	// 	j++;
-	// }
-	// set_range();
-	// aStar(initial_field);
-	// free(left_range);
-	// free(right_range);
-	// free(top_range);
-	// free(bottom_range);
-	return 0;
 }

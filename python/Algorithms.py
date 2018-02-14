@@ -11,7 +11,6 @@ class Algorithms():
 		self.algorithm = algorithm
 		self.size = size
 		self.heuristics = Heuristics(heuristics, size)
-		# self.heu_time = 0
 	# IDA* START
 
 	def depthFirstSearch(self, current, bound, g=0):
@@ -19,9 +18,7 @@ class Algorithms():
 			return current
 		for children in current.getChildrens():
 			children.setParent(current)
-			# h1 = time()
 			h = self.heuristics.getH(children)
-			# self.heu_time += (time() - h1)
 			if g + h <= bound:
 				rez = self.depthFirstSearch(children, bound, g + 1)
 				if rez != None:
@@ -90,17 +87,8 @@ class Algorithms():
 			for child in current.getChildrens():
 				if "".join(str(i) for i in child.field) not in closed:
 					child.setParent(current)
-					if self.not_in(opened, child):
-						opened.append(child)
-			# if i == 1:
-			# 	print("CLOSED")
-			# 	for elem in closed:
-			# 		elem = list(map(int, elem))
-			# 		self.print_fie(elem)
-			# 	print("OPENED")
-			# 	self.debag(opened)
-			# 	break
-			# i += 1
+					# if self.not_in(opened, child):
+					opened.append(child)
 
 	def solve(self, startField):
 		sol = None
@@ -114,15 +102,3 @@ class Algorithms():
 			sol = self.bfs(startNode)
 		# print("HEU Time = ", self.heu_time)
 		return {'time': (time() - startTime), 'solution': sol}
-
-# test = Algorithms("aStar", 3, "manhattan+linear2")
-
-# 3
-# 2 7 6
-# 3 5 4
-# 0 1 8
-
-# test.solve(Node([2,7,6,3,5,4,0,1,8], 3))
-# test.solve(Node([[1,2,3],[4,5,6],[7,0,8]], 3))
-
-# Parallel Combinatorial Search  External-Memory Graph Search

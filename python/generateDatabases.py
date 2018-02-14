@@ -6,11 +6,7 @@ from Node import Node
 
 size = 4
 all_cells = pow(size, 2)
-# patterns = [[1, 2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15]] # 7-8
-# patterns = [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15]] # 6-6-3
-# patterns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]] # 5-5-5 1
 patterns = [[1, 2, 3, 5, 6], [4, 7, 8, 11, 12], [9, 10, 13, 14, 15]] # 5-5-5 2
-# patterns = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]] # 4-4-4-3
 pdbs = []
 
 
@@ -39,29 +35,8 @@ class PatternDB:
 			self.cache[code] = state.getG()
 
 
-# class PatternState(Node):
-# 	def __init__(self, coding, blank, steps=0, parent=None, action=None, cost=0):
-# 		self.steps = steps
-# 		Node.__init__(self,coding, blank, parent, action, cost)
-#
-# 	def move(self, direction, cost=1):
-# 		row, col = self.blank
-# 		ro, co = Node.offsets[direction]
-#
-# 		if row + ro >= 0 and row+ro < board_size and col + co >= 0 and col+co < board_size:
-# 			child = PatternState(self.coding, self.blank, self.steps, self.direction, self.cost+cost)
-# 			child.swap(row,col,ro,co)
-# 			v = child.at(row,col)
-# 			if v != 0: child.steps += 1
-# 			return child
-# 		else:
-# 			return None
-
-
 def train_pattern(goal, pattern):
 	db = PatternDB(pattern)
-	# goal = PatternState(goal.code(pattern), goal.getZero())
-	# goal.coding = goal.mask(pattern)
 	frontier = deque()  # FIFO queue
 	visited = set()
 	visited.add((goal.code(pattern), goal.getZero()))
@@ -69,12 +44,6 @@ def train_pattern(goal, pattern):
 	while frontier:
 		current = frontier.popleft()
 		db.add(current)
-
-		# if current.getG() > max_train_dep: break
-		# if len(db.cache) >= 32760:
-		# 	break
-		# if len(db.cache) % 100000 == 0:
-		# 	print("ONE THOUSAND")
 
 		for child in current.getChildrens():
 			child.setParent(current)
@@ -99,28 +68,10 @@ def train():
 		print("DB CACHED")
 
 
-# def generate(databases):
-# 	dbs = []
-# 	for db in databases:
-# 		dab = Node(db, size)
-# 		rez = bfs(dab)
-# 		print("1 DONE")
-# 		dbs.append(rez)
-# 		print(rez)
-
-
 if __name__ == '__main__':
 	t = clock()
 	train()
 	print("Training time: ", clock() - t, " cpu seconds")
-	# for i in range(2):
-	# 	if i == 0:
-	# 		file = "DATABASE_7_8-1"
-	# 	else:
-	# 		file = "DATABASE_7_8-2"
-	# 	with open("../databases/" + file, 'w') as out:
-	# 		print("CACHE LEN = ", len(pdbs[i].cache))
-	# 		dump(pdbs[i].cache, out)
 	for i in range(len(patterns)):
 		file = "DATABASE_5_5_5-" + str(i + 1)
 		with open("../databases/" + file, 'w') as out:
