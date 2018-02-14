@@ -86,4 +86,4 @@ def from_site(size, path, algo, heuristics):
 	else:
 		c_time2 = "Not available"
 
-	return {'c_time': c_time2, 'python_time': round(rez['time'], 7), 'solution': solution}
+	return {'c_time': c_time2, 'python_time': round(rez['time'], 7), 'solution': solution, 'time_c': rez['time_c'], 'size_c': rez['size_c']}

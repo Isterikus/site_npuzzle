@@ -35,7 +35,7 @@ Euqlidian distance.
 You can use, combine and compare these algorithms and heuristics.
 <br>
 <br>
-For puzzles 4x4 it is recommended to use the algorithm IDA* and patternDatabase or Manhattan distance + Linear conflict mine
+For puzzles 4x4 it is recommended to use the algorithm IDA* and patternDatabase or Manhattan distance + Linear conflict mine heuristics
 </p>
 	<div id="loader" style="display: none;"></div>
 	<div class="col-sm-12 col-md-8">
@@ -122,6 +122,14 @@ For puzzles 4x4 it is recommended to use the algorithm IDA* and patternDatabase 
 			<div class="col-sm-12">
 				<label for="moves" class="col-sm-5">Number of moves:</label>
 				<span id="moves" class="col-sm-7"></span>
+			</div>
+			<div class="col-sm-12">
+				<label for="time_c" class="col-sm-5">Time complexity:</label>
+				<span id="time_c" class="col-sm-7"></span>
+			</div>
+			<div class="col-sm-12">
+				<label for="size_c" class="col-sm-5">Size complexity:</label>
+				<span id="size_c" class="col-sm-7"></span>
 			</div>
 			<div class="col-sm-12">
 				<label for="timePython" class="col-sm-5">Time Python:</label>
@@ -337,7 +345,7 @@ function checkSolvable(path, size, all_cells) {
 	for (var i = 0; i < all_cells; i++) {
 		path[i] = Number(path[i]);
 		if (path[i] == 0) {
-			zer = floor(i / size);
+			zer = size - Math.floor(i / size);
 			continue;
 		}
 		for (var j = i + 1; j < all_cells; j++) {
@@ -349,9 +357,9 @@ function checkSolvable(path, size, all_cells) {
 			}
 		}
 	}
-	console.log("BEM = ", bem, " | zer = ", zer);
 	if ((size % 2 != 0 && bem % 2 == 0) ||
-		(size % 2 == 0 && bem % 2 != 0)) {
+		(size % 2 == 0 && bem % 2 != 0 && zer % 2 == 0) ||
+		(size % 2 == 0 && bem % 2 == 0 && zer % 2 != 0)) {
 		return true;
 	} else {
 		return false;
@@ -636,6 +644,8 @@ function test() {
 				ret = $.parseJSON(translated);
 				// return translated;
 				$("#timePython").html(ret['python_time']);
+				$("#time_c").html(ret['time_c']);
+				$("#size_c").html(ret['size_c']);
 				$("#timeC").html(ret['c_time']);
 				$('#moves').html(ret['solution'].length);
 				solution = ret['solution'];

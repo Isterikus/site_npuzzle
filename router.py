@@ -47,21 +47,26 @@ def parse_file():
 		elif line[0] == '#':
 			pass
 		elif n == 0:
-			n = int(line)
+			print(line.split())
+			try:
+				n = int(line.split()[0])
+			except:
+				return json.dumps({'error': 'Bad file'})
 			print(n)
-			if not n or n < 1:
+			if n != 3 and n != 4:
 				return json.dumps({'error': 'Bad file'})
 			field_size = pow(n, 2)
-			initial_field = [0 for s in range(field_size)]
+			initial_field = [0 for _ in range(field_size)]
 		else:
-			line = [s for s in line.split(' ') if s != '']
+			line = [s for s in line.split() if s != '']
+			print(line)
 			for j in range(n):
 				try:
 					initial_field[i * n + j] = int(line[j])
 				except:
 					return json.dumps({'error': 'Bad file'})
 			i += 1
-	if not initial_field:
+	if not initial_field or len(initial_field) != pow(n, 2):
 		return json.dumps({'error': 'Bad file'})
 	return json.dumps({'size': n, 'field': initial_field})
 

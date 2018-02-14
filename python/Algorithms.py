@@ -11,12 +11,17 @@ class Algorithms():
 		self.algorithm = algorithm
 		self.size = size
 		self.heuristics = Heuristics(heuristics, size)
+		self.size_c = 1
+		self.time_c = 1
+
 	# IDA* START
 
 	def depthFirstSearch(self, current, bound, g=0):
 		if current.field == self.goal:
+			self.size_c = g
 			return current
 		for children in current.getChildrens():
+			self.time_c += 1
 			children.setParent(current)
 			h = self.heuristics.getH(children)
 			if g + h <= bound:
@@ -47,6 +52,8 @@ class Algorithms():
 		opened.append(startNode)
 		startNode.setH(self.heuristics.getH(startNode))
 		while opened:
+			if len(opened) > self.size:
+				self.size_c = len(opened)
 			curr = min(opened, key=lambda inst:inst.h)
 			opened.remove(curr)
 			if curr.field == self.goal:
@@ -58,6 +65,7 @@ class Algorithms():
 					child.setG(curr.getG() + 1)
 					child.setH(self.heuristics.getH(child) + child.getG())
 					if self.not_in(opened, child):
+						self.time_c += 1
 						opened.append(child)
 
 	def print_fie(self, field):
@@ -79,6 +87,8 @@ class Algorithms():
 		opened.append(startNode)
 		# i = 0
 		while opened:
+			if len(opened) > self.size:
+				self.size_c = len(opened)
 			current = opened.popleft()
 
 			if current.field == self.goal:
@@ -88,6 +98,7 @@ class Algorithms():
 				if "".join(str(i) for i in child.field) not in closed:
 					child.setParent(current)
 					# if self.not_in(opened, child):
+					self.time_c += 1
 					opened.append(child)
 
 	def solve(self, startField):
@@ -101,4 +112,4 @@ class Algorithms():
 		elif self.algorithm == "bfs":
 			sol = self.bfs(startNode)
 		# print("HEU Time = ", self.heu_time)
-		return {'time': (time() - startTime), 'solution': sol}
+		return {'time': (time() - startTime), 'solution': sol, 'time_c': self.time_c, 'size_c': self.size_c}
