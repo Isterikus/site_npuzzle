@@ -8,7 +8,7 @@ all: $(NAME)
 $(NAME): $(SRCO)
 
 %.o: %.c
-	@ gcc -Wall -Wextra -Werror -c -o $@ $< -I $(HEADER)
+	@ gcc -fPIC -c -o $@ $< -I $(HEADER)
 
 clean:
 	rm $(SRCO)

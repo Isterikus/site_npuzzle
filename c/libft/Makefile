@@ -39,7 +39,7 @@ $(NAME): $(PRINTF_COMPILED)
 	@echo "made" $(NAME)
 
 $(PRINTF_COMPILED): %.o: %.c
-	@$(CC) $(FLAGS) -c -o $@ $< -I $(PRINTF_SRC_HEADER)
+	@$(CC) -fPIC -c -o $@ $< -I $(PRINTF_SRC_HEADER)
 clean:
 	@-/bin/rm -f $(PRINTF_COMPILED)
 	@-/bin/rm -f $(SRCO_libft_functions)

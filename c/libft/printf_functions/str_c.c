@@ -59,10 +59,8 @@ void	first_c(char *str, t_printf *elem, char c, int acc)
 
 void	create_spaces(char *str, t_printf *elem, char c, int flag)
 {
-	int		i;
 	int		acc;
 
-	i = 0;
 	if (elem->accuracy != -12345 && elem->accuracy < (int)ft_strlen(str)
 		&& elem->type != 'p')
 		acc = elem->accuracy;
@@ -102,7 +100,7 @@ int		print_string(t_printf *elem, va_list *ap)
 			ft_putchar(str[i]);
 	else
 		ft_putstr(str);
-	return ((i == -1) ? ft_strlen(str) : i);
+	return ((i == -1) ? ft_strlen(str) : (unsigned int)i);
 }
 
 int		print_char(t_printf *elem, va_list *ap, int flag)

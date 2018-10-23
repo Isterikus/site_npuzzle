@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
+#include <stdint.h>
 #include "libft/printf_functions/includes/header.h"
 
 #define BUFF_SIZE 1000000

@@ -43,10 +43,8 @@ char	*ft_encode(wchar_t c)
 int		print_wchar(t_printf *elem, va_list *ap)
 {
 	wchar_t	*str;
-	int		ret;
 
 	str = (wchar_t *)malloc(sizeof(wchar_t) * 2);
-	ret = 0;
 	if (elem->type == 'C')
 	{
 		str[0] = va_arg(*ap, wchar_t);

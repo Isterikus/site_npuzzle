@@ -22,7 +22,8 @@ def info():
 @app.route('/rand', methods=['POST'])
 def rand():
 	path2 = getRandomPath(int(request.values['size']))
-	return json.dumps(path2)
+	print(path2)
+	return json.dumps([int(val) for val in path2]) # int32 переганяем, нампай... дописать свой флаттен
 
 
 @app.route('/solve', methods=['POST'])

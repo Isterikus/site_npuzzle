@@ -56,9 +56,6 @@ int		print_plus(int d, t_printf *elem)
 
 int		count_plus(int d, t_printf *elem)
 {
-	int		i;
-
-	i = 0;
 	if (ft_strchr(elem->flags, '#') != NULL)
 	{
 		if ((elem->type == 'x' || elem->type == 'X') && d != 0)

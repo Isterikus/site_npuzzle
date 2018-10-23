@@ -382,7 +382,8 @@ function validatePath(path) {
 			return false;
 		}
 	}
-	// return true;
+	return true;
+	// TODO дописать новый checkSolvable для snake
 	if (checkSolvable(path, size, all_cells)) {
 		return true;
 	} else {

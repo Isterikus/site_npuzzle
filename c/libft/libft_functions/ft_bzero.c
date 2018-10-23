@@ -20,5 +20,5 @@ void	ft_bzero(void *s, size_t n)
 	i = -1;
 	b = (unsigned char *)s;
 	while (++i < n)
-		b[i] = (unsigned char)(NULL);
+		b[i] = (unsigned char)(0);
 }

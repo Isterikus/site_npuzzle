@@ -18,6 +18,7 @@
 # include <stdarg.h>
 # include <limits.h>
 # include <stdio.h>
+# include <stdint.h>
 # include "../../libft_functions/includes/libft.h"
 
 # define TYPES "sSpdDiboOuUxXcCfFeEgG%RZm"
