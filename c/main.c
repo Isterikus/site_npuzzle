@@ -933,8 +933,23 @@ int     index_of(int val, int *arr, int size)
     i = 0;
     while (i < size)
     {
-        if ()
+        if (arr[i] == val)
+            return i;
     }
+    return -1;
+}
+
+int     *get_goal(int size)
+{
+    int     i;
+    int     *goal;
+
+    i = 0;
+    goal = (int *)malloc(sizeof(int) * size * size);
+    while (i < size * size)
+        goal[i] = i + 1;
+    goal[i - 1] = i;
+    return goal;
 }
 
 float	python(int sz, char *field, char *algo, char *heurs)
@@ -944,6 +959,7 @@ float	python(int sz, char *field, char *algo, char *heurs)
 	int				j;
 	struct timeval	stop, start;
 	int             *snake_field;
+	int             *goal;
 
 	n = sz;
 	size = n * n;
@@ -951,11 +967,13 @@ float	python(int sz, char *field, char *algo, char *heurs)
 	i = 0;
 	j = 0;
 	snake_field = get_snake(n);
+	goal = get_goal(n);
 	while (field[i])
 	{
 		initial_field[j] = 0;
 		while (field[i] && field[i] != ',')
 			initial_field[j] = initial_field[j] * 10 + field[i++] - 48;
+		initial_field[j] = goal[index_of(initial_field[j], snake_field, size)];
 		if (field[i])
 			i++;
 		j++;
