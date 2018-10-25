@@ -302,6 +302,7 @@ function delay_loop(i, before) {
     // start a delay
     setTimeout(function(){
 		move = solution.charAt(i);
+		console.log('Now move', move);
 		zero_id = document.getElementsByClassName("empty")[0].id;
 		now_zero = parse_tile(zero_id);
 		if (move == 'l') {
@@ -322,7 +323,7 @@ function delay_loop(i, before) {
 		document.getElementsByClassName("empty")[0].id = tile_move;
 
 		// recursive call
-		if (i < solution.length) {
+		if (i < solution.length - 1) {
 			delay_loop(i + 1, before);
 		}
 		else {
@@ -333,7 +334,7 @@ function delay_loop(i, before) {
 					// alert( index + ": " + value );
 					$(value).prop('disabled', false);
 				});
-			}, 1200);
+			}, 5000);
 		}
 
 	}, 500);

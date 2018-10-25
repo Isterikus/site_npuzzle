@@ -3,10 +3,12 @@ from random import randint
 
 from .Algorithms import *
 from .Node import *
+from .Heuristics import *
 
 
 import multiprocessing.pool
 import functools
+
 
 def timeout(max_timeout):
 	def timeout_decorator(item):
@@ -18,13 +20,17 @@ def timeout(max_timeout):
 		return func_wrapper
 	return timeout_decorator
 
+
 def doRand(size):
-	# bem = [i + 1 for i in range(pow(size, 2))]
-	# bem[pow(size, 2) - 1] = 0
+	# goal = [i + 1 for i in range(pow(size, 2))]
+	# goal[pow(size, 2) - 1] = 0
 	bem = get_snake(size)
+	# what_to_move = goal[bem.index(0)]
+	# print(what_to_move)
+	heuristics = Heuristics(['manhattan'], size, 0, 0)
 	goal = Node(bem, size)
 	for _ in range(500):
-		child = goal.getChildrens()
+		child = goal.getChildrens(heuristics)
 		i = randint(0, len(child) - 1)
 		goal = child[i]
 	return goal.field
@@ -49,12 +55,12 @@ def getRandomPath(size):
 	# return path
 
 
-def parse_solve(node):
+def parse_solve(node, heu):
 	solution = ""
 	prev = node
 	node = node.parent
 	while node != None:
-		diff = prev.getZero() - node.getZero()
+		diff = heu.getZero(prev.field) - heu.getZero(node.field)
 		if diff == -1:
 			solution += 'l'
 		elif diff == 1:
@@ -72,8 +78,9 @@ def parse_solve(node):
 def from_site(size, path, algo, heuristics):
 	f = Algorithms(algo, size, heuristics)
 	rez = f.solve(path)
-	solution = parse_solve(rez['solution'])
+	solution = parse_solve(rez['solution'], f.heuristics)
 	to_c = ""
+	print(solution)
 	for el in path:
 		to_c += "," + str(el)
 	to_c = to_c[1:]

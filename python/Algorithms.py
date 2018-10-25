@@ -4,6 +4,7 @@ import numpy as np
 from .Heuristics import *
 from .Node import *
 
+
 def get_snake(n):
 	way = 'r'
 	arr = [[0 for _ in range(n)] for _ in range(n)]
@@ -70,7 +71,8 @@ class Algorithms():
 		self.goal[pow(size, 2) - 1] = 0
 		self.algorithm = algorithm
 		self.size = size
-		self.heuristics = Heuristics(heuristics, size)
+		self.heu = heuristics
+		self.heuristics = None
 		self.size_c = 1
 		self.time_c = 1
 
@@ -80,7 +82,7 @@ class Algorithms():
 		if current.field == self.goal:
 			self.size_c = g
 			return current
-		for children in current.getChildrens():
+		for children in current.getChildrens(self.heuristics):
 			self.time_c += 1
 			children.setParent(current)
 			h = self.heuristics.getH(children)
@@ -120,7 +122,7 @@ class Algorithms():
 			if curr.field == self.goal:
 				return curr
 			closed.add("".join(map(str, curr.field)))
-			for child in curr.getChildrens():
+			for child in curr.getChildrens(self.heuristics):
 				if "".join(map(str, child.field)) not in closed:
 					child.setParent(curr)
 					child.setG(curr.getG() + 1)
@@ -155,7 +157,7 @@ class Algorithms():
 			if current.field == self.goal:
 				return current
 			closed.add("".join(str(i) for i in current.field))
-			for child in current.getChildrens():
+			for child in current.getChildrens(self.heuristics):
 				if "".join(str(i) for i in child.field) not in closed:
 					child.setParent(current)
 					# if self.not_in(opened, child):
@@ -166,6 +168,9 @@ class Algorithms():
 		snake_goal = get_snake(self.size)
 		print(startField)
 		new_start_field = [self.goal[snake_goal.index(val)] for val in startField]
+		what_to_move = self.goal[snake_goal.index(0)]
+		to_remember = snake_goal[self.goal.index(0)]
+		self.heuristics = Heuristics(self.heu, self.size, what_to_move, to_remember)
 		print(new_start_field)
 		sol = None
 		startTime = time()

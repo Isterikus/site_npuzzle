@@ -2,18 +2,27 @@ from json import load
 from math import sqrt
 
 class Heuristics():
-	def __init__(self, heuristics, size):
+	def __init__(self, heuristics, size, what_to_move, to_remember):
 		self.heuristics = heuristics
 		self.size = size
 		self.all_cells = pow(size, 2)
 		self.real_positions = [{} for i in range(self.all_cells)]
 		self.realPositions()
-		self.patterns = [[1, 2, 3, 5, 6], [4, 7, 8, 11, 12], [9, 10, 13, 14, 15]]  # 5-5-5 2
+		# self.patterns = [[1, 2, 3, 5, 6], [4, 7, 8, 11, 12], [9, 10, 13, 14, 15]]  # 5-5-5 2
+		self.patterns = [[1, 2, 3, 5, 6], [4, 7, 8, 11, 12], [9, 13, 14, 15, 0]]
 		self.databases = []
+		self.what_to_move = what_to_move
+		self.to_remember = to_remember
+		print(what_to_move, to_remember)
 		for i in range(len(self.patterns)):
 			file = "DATABASE_5_5_5-" + str(i + 1)
 			with open("./databases/" + file, 'r') as f:
 				self.databases.append(load(f))
+
+	def getZero(self, field):
+		for i in range(len(field)):
+			if field[i] == self.what_to_move:
+				return i
 
 	def realPositions(self):
 		for c in range(1, self.all_cells):
@@ -64,7 +73,7 @@ class Heuristics():
 	def patternDatabase(self, node):
 		ret = 0
 		for i in range(len(self.patterns)):
-			ret += self.databases[i][node.code(self.patterns[i])]
+			ret += self.databases[i][node.code(self.patterns[i], self.what_to_move, self.to_remember)]
 		return ret
 
 	def tilesOut(self, field):

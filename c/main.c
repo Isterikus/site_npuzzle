@@ -11,8 +11,121 @@ char		*heuristics;
 t_db		*database1;
 t_db		*database2;
 t_db		*database3;
-int			patterns[3][5] = {{1, 2, 3, 5, 6}, {4, 7, 8, 11, 12}, {9, 10, 13, 14, 15}};
+//int			patterns[3][5] = {{1, 2, 3, 5, 6}, {4, 7, 8, 11, 12}, {9, 10, 13, 14, 15}};
+int			patterns[3][5] = {{1, 2, 3, 5, 6}, {4, 7, 8, 11, 12}, {9, 13, 14, 15, 0}};
 t_realPos	*realPos;
+
+int     *get_snake(int n)
+{
+    char    way;
+    int     **arr;
+    int     i;
+    int     j;
+    int     go_to;
+    int     ch_go_to;
+    int     cou_go_to;
+    int     passed_way;
+    int     count;
+    int     *ret;
+
+    way = 'r';
+    arr = (int **)malloc(sizeof(int *) * n);
+    ret = (int *)malloc(sizeof(int *) * n * n);
+    i = 0;
+    while (i < n)
+    {
+        arr[i] = (int *)malloc(sizeof(int) * n);
+        i += 1;
+    }
+    i = 0;
+    j = 0;
+    go_to = n - 1;
+    ch_go_to = 3;
+    cou_go_to = 0;
+    passed_way = 0;
+    count = 1;
+    while (count <= n ** 2)
+    {
+        arr[i][j] = count;
+        if (count == n ** 2)
+            arr[i][j] = 0;
+        count += 1;
+        if (way == 'r')
+        {
+            if (passed_way == go_to)
+            {
+                way = 'd';
+                i += 1;
+                cou_go_to += 1;
+                passed_way = 1;
+            } else
+            {
+                passed_way += 1;
+                j += 1;
+            }
+        } else if (way == 'd')
+        {
+            if (passed_way == go_to)
+            {
+                way = 'l';
+                j -= 1;
+                cou_go_to += 1;
+                passed_way = 1;
+            } else
+            {
+                i += 1;
+                passed_way += 1;
+            }
+        } else if (way == 'l')
+        {
+            if (passed_way == go_to)
+            {
+                way = 'u';
+                i -= 1;
+                cou_go_to += 1;
+                passed_way = 1;
+            } else
+            {
+                j -= 1;
+                passed_way += 1;
+            }
+        } else if (way == 'u')
+        {
+            if (passed_way == go_to)
+            {
+                way = 'r';
+                j += 1;
+                cou_go_to += 1;
+                passed_way = 1;
+            } else
+            {
+                i -= 1;
+                passed_way += 1;
+            }
+        }
+        if (cou_go_to == ch_go_to)
+        {
+            cou_go_to = 0;
+            go_to -= 1;
+            if (ch_go_to == 3)
+                ch_go_to = 2;
+        }
+    }
+    i = 0;
+    j = 0;
+    count = 0;
+    while (i < n)
+    {
+        while (j < n)
+        {
+            ret[count] = arr[i][j];
+            count += 1;
+            j += 1;
+        }
+        i += 1;
+    }
+    return ret;
+}
 
 void	set_range()
 {
@@ -813,18 +926,31 @@ int		checkHeur(char *check)
 	return 0;
 }
 
+int     index_of(int val, int *arr, int size)
+{
+    int     i;
+
+    i = 0;
+    while (i < size)
+    {
+        if ()
+    }
+}
+
 float	python(int sz, char *field, char *algo, char *heurs)
 {
 	int				*initial_field;
 	int				i;
 	int				j;
 	struct timeval	stop, start;
+	int             *snake_field;
 
 	n = sz;
 	size = n * n;
 	initial_field = (int *)malloc(sizeof(int) * size);
 	i = 0;
 	j = 0;
+	snake_field = get_snake(n);
 	while (field[i])
 	{
 		initial_field[j] = 0;
