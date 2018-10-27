@@ -48,7 +48,7 @@ def get_snake(n):
 			else:
 				j -= 1
 				passed_way += 1
-		elif way =='u':
+		elif way == 'u':
 			if passed_way == go_to:
 				way = 'r'
 				j += 1
@@ -65,7 +65,7 @@ def get_snake(n):
 	return [int(val) for val in np.array(arr).flatten()]
 
 
-class Algorithms():
+class Algorithms:
 	def __init__(self, algorithm, size, heuristics):
 		self.goal = [i + 1 for i in range(pow(size, 2))]
 		self.goal[pow(size, 2) - 1] = 0
